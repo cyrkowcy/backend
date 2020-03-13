@@ -1,4 +1,10 @@
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+mainClassName = 'pl.edu.pk.backend.MainKt'
+
 dependencies {
+  compile project(":core")
   compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
   compile "io.vertx:vertx-core:$vertxVersion"
@@ -8,4 +14,13 @@ dependencies {
   testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
   testCompile "org.junit.jupiter:junit-jupiter-params:$junitVersion"
   testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+}
+
+shadowJar {
+  archiveName = "backend.jar"
+  destinationDirectory = new File("${rootProject.projectDir}/target/")
+  classifier = 'fat'
+  from('src/main/resources') {
+    include '**/*'
+  }
 }

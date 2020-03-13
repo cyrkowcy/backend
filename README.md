@@ -24,7 +24,7 @@ Run tests:
 ```
 or run tests from IDE.
 
-Build far jar:
+Build fat jar:
 ```
 ./gradlew shadowJar
 ```

@@ -19,7 +19,29 @@ group 'pl.edu.pk.backend'
 version '1.0'
 
 allprojects {
+  apply plugin: 'idea'
+  apply plugin: 'kotlin'
+
   repositories {
     mavenCentral()
+  }
+
+  ext {
+    vertxVersion = "3.8.5"
+    junitVersion = "5.6.0"
+    assertJVersion = "3.15.0"
+    mockkJVersion = "1.9.3"
+  }
+
+  tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+    kotlinOptions {
+      jvmTarget = "1.8"
+    }
+  }
+}
+
+subprojects {
+  test {
+    useJUnitPlatform()
   }
 }

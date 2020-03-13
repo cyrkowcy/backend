@@ -1,2 +1,2 @@
-include 'core'
+include 'api', 'core'
 rootProject.name = 'backend'
