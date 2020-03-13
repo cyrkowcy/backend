@@ -1,11 +1,9 @@
-## Maven
-target/
-
 ## Java
 
 *.class
 *.war
 *.ear
+*.jar
 hs_err_pid*
 
 ## GWT
@@ -59,4 +57,3 @@ nb-configuration.xml
 ## Gradle
 
 .gradle
-/target
