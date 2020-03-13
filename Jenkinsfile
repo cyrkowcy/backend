@@ -13,5 +13,16 @@ pipeline {
       }
     }
 
+    stage('Test') {
+      steps {
+        echo 'Start test'
+        withGradle() {
+          sh './gradlew test'
+        }
+
+        echo 'End test'
+      }
+    }
+
   }
 }
