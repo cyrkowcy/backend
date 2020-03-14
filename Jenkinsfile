@@ -24,5 +24,14 @@ pipeline {
       }
     }
 
+    stage('docker') {
+      steps {
+        dir(path: 'target') {
+          sh 'docker build .'
+        }
+
+      }
+    }
+
   }
 }
