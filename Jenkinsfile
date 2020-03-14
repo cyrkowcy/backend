@@ -1,7 +1,7 @@
 pipeline {
   agent any
   stages {
-    stage('Build') {
+    stage('Preapre') {
       steps {
         echo 'Preparing...'
         withGradle() {
@@ -20,6 +20,17 @@ pipeline {
         }
 
         echo 'End test'
+      }
+    }
+
+    stage('Build jar') {
+      steps {
+        echo 'Starting build'
+        withGradle() {
+          sh './gradlew clean build'
+        }
+
+        echo 'Build ended'
       }
     }
 
