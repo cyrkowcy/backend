@@ -3,13 +3,12 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        echo 'Start Build'
+        echo 'Preparing...'
         withGradle() {
           sh 'chmod +x gradlew'
-          sh './gradlew clean build'
         }
 
-        echo 'End build'
+        echo 'Preparing ended'
       }
     }
 
@@ -21,15 +20,6 @@ pipeline {
         }
 
         echo 'End test'
-      }
-    }
-
-    stage('docker') {
-      steps {
-        dir(path: 'target') {
-          sh 'docker build .'
-        }
-
       }
     }
 
