@@ -13,5 +13,25 @@ pipeline {
       }
     }
 
+    stage('Test') {
+      steps {
+        echo 'Start test'
+        withGradle() {
+          sh './gradlew test'
+        }
+
+        echo 'End test'
+      }
+    }
+
+    stage('docker') {
+      steps {
+        dir(path: 'target') {
+          sh 'docker build .'
+        }
+
+      }
+    }
+
   }
 }
