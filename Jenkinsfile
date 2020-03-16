@@ -34,5 +34,28 @@ pipeline {
       }
     }
 
+    stage('Docker prepare') {
+      steps {
+        sh 'docker container stop backendrun'
+        sh 'docker container rm backendrun'
+        sh 'docker image rm backend'
+      }
+    }
+
+    stage('Docker build') {
+      steps {
+        dir(path: '/var/lib/jenkins/workspace/backend_master/target/') {
+          sh 'docker build . -t backend'
+        }
+
+      }
+    }
+
+    stage('Docker run') {
+      steps {
+        sh 'docker run -d -p 8090:8090 --name backendrun -it backend'
+      }
+    }
+
   }
 }
