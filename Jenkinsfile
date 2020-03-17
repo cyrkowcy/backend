@@ -1,5 +1,13 @@
 pipeline {
   agent any
+
+  environment {
+    DATABASE_HOST     = '127.0.0.1:5432'
+    DATABASE_TABLE    = 'tourtool'
+    DATABASE_USER     = 'backend'
+    DATABASE_PASSWORD = credentials('database-password')
+  }
+
   stages {
     stage('Prepare') {
       steps {
