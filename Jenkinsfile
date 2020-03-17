@@ -42,6 +42,14 @@ pipeline {
       }
     }
 
+    stage('Migrate database') {
+      steps {
+        withGradle() {
+          sh './gradlew flywayMigrate'
+        }
+      }
+    }
+
     stage('Docker build') {
       steps {
         dir(path: '/var/lib/jenkins/workspace/backend_master/target/') {
