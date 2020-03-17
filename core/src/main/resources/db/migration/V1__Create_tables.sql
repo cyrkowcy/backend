@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS user_account(
     surname TEXT NOT NULL,
     email TEXT NOT NULL,
     password TEXT NOT NULL,
-    active BOOLEAN NOT NULL DEFAULT 0,
-    disabled BOOLEAN NOT NULL DEFAULT 0
+    active BOOLEAN NOT NULL DEFAULT FALSE,
+    disabled BOOLEAN NOT NULL DEFAULT FALSE
 );
 CREATE TABLE IF NOT EXISTS comment_category (
     id_comment_category SERIAL PRIMARY KEY,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS payment_method (
     id_payment_method SERIAL PRIMARY KEY,
     psp_name text NOT NULL,
     token text NOT NULL,
-    expired smallint NOT NULL DEFAULT 0,
+    expired BOOLEAN NOT NULL DEFAULT FALSE,
     user_account_id INT NOT NULL,
     FOREIGN KEY (user_account_id) REFERENCES user_account(id_user_account)
 );
