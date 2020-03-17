@@ -1,7 +1,7 @@
 pipeline {
   agent any
   stages {
-    stage('Preapre') {
+    stage('Prepare') {
       steps {
         echo 'Preparing...'
         withGradle() {
@@ -16,7 +16,7 @@ pipeline {
       steps {
         echo 'Start test'
         withGradle() {
-          sh './gradlew test'
+          sh './gradlew ktlintCheck test'
         }
 
         echo 'End test'
