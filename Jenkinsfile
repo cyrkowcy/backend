@@ -45,8 +45,8 @@ pipeline {
     stage('Docker prepare') {
       steps {
         sh 'docker container stop backendrun || true'
-        sh 'docker container rm backendrun'
-        sh 'docker image rm backend'
+        sh 'docker container rm backendrun || true'
+        sh 'docker image rm backend || true'
       }
     }
 
