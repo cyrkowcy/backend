@@ -7,7 +7,7 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
   val router = Router.router(vertx)
   router.route().handler(AccessLogger()::handle)
   with(controllers.statusController) {
-    router.get("/").handler(this::getStatus)
+    router.get("/api/").handler(this::getStatus)
   }
   return router
 }
