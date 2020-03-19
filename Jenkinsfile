@@ -32,6 +32,12 @@ pipeline {
     }
 
     stage('Build jar') {
+      when {
+        anyOf {
+          branch 'master'
+          branch 'prerelease'
+        }
+      }
       steps {
         echo 'Starting build'
         withGradle() {
@@ -43,6 +49,12 @@ pipeline {
     }
 
     stage('Docker prepare') {
+      when {
+        anyOf {
+          branch 'master'
+          branch 'prerelease'
+        }
+      }
       steps {
         sh 'docker container stop backendrun || true'
         sh 'docker container rm backendrun || true'
@@ -51,6 +63,12 @@ pipeline {
     }
 
     stage('Migrate database') {
+      when {
+        anyOf {
+          branch 'master'
+          branch 'prerelease'
+        }
+      }
       steps {
         withGradle() {
           sh './gradlew flywayMigrate'
@@ -59,6 +77,12 @@ pipeline {
     }
 
     stage('Docker build') {
+      when {
+        anyOf {
+          branch 'master'
+          branch 'prerelease'
+        }
+      }
       steps {
         dir(path: '/var/lib/jenkins/workspace/backend_master/target/') {
           sh 'docker build . -t backend'
@@ -68,6 +92,12 @@ pipeline {
     }
 
     stage('Docker run') {
+      when {
+        anyOf {
+          branch 'master'
+          branch 'prerelease'
+        }
+      }
       steps {
         sh 'docker run -d -p 8090:8090 --name backendrun -it backend'
       }
