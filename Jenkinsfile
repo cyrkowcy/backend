@@ -32,12 +32,6 @@ pipeline {
     }
 
     stage('Build jar') {
-      when {
-        anyOf {
-          branch 'master'
-          branch 'prerelease'
-        }
-      }
       steps {
         echo 'Starting build'
         withGradle() {
@@ -48,25 +42,10 @@ pipeline {
       }
     }
 
-    stage('Docker prepare') {
-      when {
-        anyOf {
-          branch 'master'
-          branch 'prerelease'
-        }
-      }
-      steps {
-        sh 'docker container stop backendrun || true'
-        sh 'docker container rm backendrun || true'
-        sh 'docker image rm backend || true'
-      }
-    }
-
     stage('Migrate database') {
       when {
         anyOf {
           branch 'master'
-          branch 'prerelease'
         }
       }
       steps {
@@ -76,11 +55,58 @@ pipeline {
       }
     }
 
+    stage('Docker prepare phase test') {
+      when {
+        anyOf {
+          branch 'master'
+        }
+      }
+      steps {
+        sh 'docker ps -q --filter "name=backendruntest" | grep -q . && docker stop backendruntest && docker  rm backendruntest'
+        sh 'docker image rm backendtest'
+      }
+    }
+
+
+    stage('Docker build phase test') {
+      when {
+        anyOf {
+          branch 'master'
+        }
+      }
+      steps {
+        dir(path: '/var/lib/jenkins/workspace/backend_master/target/') {
+          sh 'docker build . -t backendtest'
+        }
+
+      }
+    }
+
+    stage('Docker run phase test') {
+      when {
+        anyOf {
+          branch 'master'
+        }
+      }
+      steps {
+        sh 'docker run -d -p 8090:8091 --name backendruntest -it backendtest'
+      }
+    }
+    stage('Docker prepare ') {
+      when {
+        anyOf {
+          branch 'master'
+        }
+      }
+      steps {
+        sh 'docker ps -q --filter "name=backendrun" | grep -q . && docker stop backendrun && docker  rm backendrun'
+        sh 'docker image rm backend'
+      }
+    }
     stage('Docker build') {
       when {
         anyOf {
           branch 'master'
-          branch 'prerelease'
         }
       }
       steps {
@@ -95,7 +121,6 @@ pipeline {
       when {
         anyOf {
           branch 'master'
-          branch 'prerelease'
         }
       }
       steps {
