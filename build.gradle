@@ -35,6 +35,7 @@ allprojects {
     junitVersion = "5.6.0"
     assertJVersion = "3.15.0"
     mockkJVersion = "1.9.3"
+    log4jVersion = "2.13.1"
   }
 
   tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
