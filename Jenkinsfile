@@ -86,7 +86,7 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8091:8090 --name backendruntest -it backendtest'
+        sh 'docker run -d -p 8092:8090 --name backendruntest -it backendtest'
       }
     }
 
