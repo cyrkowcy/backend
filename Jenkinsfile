@@ -27,7 +27,6 @@ pipeline {
         }
       }
       steps {
-        echo "Current Pull Request ID: ${pullRequest.id}"
         echo 'Start test'
         withGradle() {
           sh './gradlew ktlintCheck test'
