@@ -62,8 +62,8 @@ pipeline {
         }
       }
       steps {
-        sh 'docker ps -q --filter "name=backendruntest" | grep -q . && docker stop backendruntest && docker  rm backendruntest'
-        sh 'docker image rm backendtest'
+        sh 'docker ps -q --filter "name=backendruntest" | grep -q . && docker stop backendruntest && docker rm backendruntest'
+        sh 'docker image rm backendtest || true'
       }
     }
 
@@ -99,8 +99,8 @@ pipeline {
         }
       }
       steps {
-        sh 'docker ps -q --filter "name=backendrun" | grep -q . && docker stop backendrun && docker  rm backendrun'
-        sh 'docker image rm backend'
+        sh 'docker ps -q --filter "name=backendrun" | grep -q . && docker stop backendrun && docker rm backendrun'
+        sh 'docker image rm backend || true'
       }
     }
     stage('Docker build') {
