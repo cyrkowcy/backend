@@ -21,15 +21,20 @@ pipeline {
     }
 
     stage('Test') {
-      if (env.CHANGE_ID) {
-        steps {
-          echo 'Start test'
-          withGradle() {
-            sh './gradlew ktlintCheck test'
-          }
-          echo 'End test'
+      when {
+        anyOf {
+          changeRequest()
         }
       }
+      steps {
+        echo "Current Pull Request ID: ${pullRequest.id}"
+        echo 'Start test'
+        withGradle() {
+          sh './gradlew ktlintCheck test'
+        }
+        echo 'End test'
+      }
+      
     }
 
     stage('Build jar') {
