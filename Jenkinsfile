@@ -62,7 +62,8 @@ pipeline {
         }
       }
       steps {
-        sh '(docker ps -q --filter "name=backendruntest"  | grep -q . ) && docker stop backendruntest && docker rm backendruntest'
+        sh 'docker stop backendruntest || true'
+        sh 'docker rm backendruntest  || true'
         sh 'docker image rm backendtest || true'
       }
     }
@@ -99,7 +100,8 @@ pipeline {
         }
       }
       steps {
-        sh '(docker ps -q --filter "name=backendrun" | grep -q . ) && docker stop backendrun && docker rm backendrun'
+        sh 'docker stop backendrun || true'
+        sh 'docker rm backendrun  || true'
         sh 'docker image rm backend || true'
       }
     }
