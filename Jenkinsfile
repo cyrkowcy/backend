@@ -21,17 +21,23 @@ pipeline {
     }
 
     stage('Test') {
-      steps {
-        echo 'Start test'
-        withGradle() {
-          sh './gradlew ktlintCheck test'
+      if (env.CHANGE_ID) {
+        steps {
+          echo 'Start test'
+          withGradle() {
+            sh './gradlew ktlintCheck test'
+          }
+          echo 'End test'
         }
-
-        echo 'End test'
       }
     }
 
     stage('Build jar') {
+      when {
+        anyOf {
+          branch 'master'
+        }
+      }
       steps {
         echo 'Starting build'
         withGradle() {
