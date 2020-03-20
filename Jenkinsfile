@@ -1,13 +1,5 @@
 pipeline {
   agent any
-
-  environment {
-    DATABASE_HOST     = '127.0.0.1:5432'
-    DATABASE_TABLE    = 'tourtool'
-    DATABASE_USER     = 'backend'
-    DATABASE_PASSWORD = credentials('database-password')
-  }
-
   stages {
     stage('Prepare') {
       steps {
@@ -57,11 +49,13 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         withGradle() {
           sh './gradlew flywayMigrate'
         }
+
       }
     }
 
@@ -70,6 +64,7 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         sh 'docker stop backendruntest || true'
@@ -78,12 +73,12 @@ pipeline {
       }
     }
 
-
     stage('Docker build phase test') {
       when {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         dir(path: '/var/lib/jenkins/workspace/backend_master/target/') {
@@ -98,16 +93,19 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
-        sh 'docker run -d -p 8090:8091 --name backendruntest -it backendtest'
+        sh 'docker run -d -p 8091:8090 --name backendruntest -it backendtest'
       }
     }
+
     stage('Docker prepare ') {
       when {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         sh 'docker stop backendrun || true'
@@ -115,11 +113,13 @@ pipeline {
         sh 'docker image rm backend || true'
       }
     }
+
     stage('Docker build') {
       when {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         dir(path: '/var/lib/jenkins/workspace/backend_master/target/') {
@@ -134,11 +134,18 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         sh 'docker run -d -p 8090:8090 --name backendrun -it backend'
       }
     }
 
+  }
+  environment {
+    DATABASE_HOST = '127.0.0.1:5432'
+    DATABASE_TABLE = 'tourtool'
+    DATABASE_USER = 'backend'
+    DATABASE_PASSWORD = credentials('database-password')
   }
 }
