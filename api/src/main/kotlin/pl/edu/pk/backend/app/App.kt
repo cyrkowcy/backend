@@ -1,7 +1,6 @@
 package pl.edu.pk.backend.app
 
 import io.vertx.core.Vertx
-import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.SqlClient
 import pl.edu.pk.backend.Repositories
 import pl.edu.pk.backend.Services
