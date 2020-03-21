@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS user_account(
     id_user_account SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    surname TEXT NOT NULL,
-    email TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    active BOOLEAN NOT NULL DEFAULT FALSE,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
     disabled BOOLEAN NOT NULL DEFAULT FALSE
 );
 CREATE TABLE IF NOT EXISTS comment_category (

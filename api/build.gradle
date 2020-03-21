@@ -10,6 +10,7 @@ dependencies {
   compile "io.vertx:vertx-core:$vertxVersion"
   compile "io.vertx:vertx-lang-kotlin:$vertxVersion"
   compile "io.vertx:vertx-web:$vertxVersion"
+  compile "io.vertx:vertx-pg-client:$vertxVersion"
   compile "org.apache.logging.log4j:log4j-api:$log4jVersion"
   compile "org.apache.logging.log4j:log4j-core:$log4jVersion"
   testCompile "org.assertj:assertj-core:$assertJVersion"
