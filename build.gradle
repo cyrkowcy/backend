@@ -54,7 +54,7 @@ subprojects {
 }
 
 flyway {
-  url = "jdbc:postgresql://${System.getenv('DATABASE_HOST')}/${System.getenv('DATABASE_TABLE')}"
+  url = "jdbc:postgresql://${System.getenv('DATABASE_HOST')}/${System.getenv('DATABASE_NAME')}"
   user = System.getenv('DATABASE_USER')
   password = System.getenv('DATABASE_PASSWORD')
   locations = ["filesystem:${project.projectDir}/core/src/main/resources/db/migration"]
