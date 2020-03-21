@@ -16,8 +16,9 @@ class UserRepository(private val pool: PgPool) {
         val rows = ar.result()
         if (rows.size() == 0) {
           promise.fail(NoSuchResourceException("No such user with email: $email"))
+        } else {
+          promise.complete(mapUser(rows.first()))
         }
-        promise.complete(mapUser(rows.first()))
       } else {
         promise.fail(ar.cause())
       }
