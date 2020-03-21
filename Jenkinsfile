@@ -86,7 +86,7 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendruntest -it backendtest  -net netapp '
+        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendruntest -it backendtest  --net netapp '
       }
     }
 
@@ -127,7 +127,7 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendrun -it backend -net netapp '
+        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendrun -it backend --net netapp '
       }
     }
 
