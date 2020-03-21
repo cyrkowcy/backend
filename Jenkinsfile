@@ -86,7 +86,7 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8091:8090 --name backendruntest -it backendtest'
+        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendruntest -it backendtest'
       }
     }
 
@@ -127,7 +127,7 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8090:8090 --name backendrun -it backend'
+        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendrun -it backend'
       }
     }
 
