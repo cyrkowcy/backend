@@ -16,7 +16,7 @@ pipeline {
       steps {
         echo 'Start test'
         withGradle() {
-          sh './gradlew clean ktlintCheck test'
+          sh './gradlew clean ktlintCheck test --info'
         }
 
         echo 'End test'
