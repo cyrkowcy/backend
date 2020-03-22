@@ -35,7 +35,7 @@ task copySwaggerUi {
       }
       includeEmptyDirs = false
       filter {
-        it.replaceAll('https://petstore.swagger.io/v2/swagger.json', '/api.yaml')
+        it.replaceAll('https://petstore.swagger.io/v2/swagger.json', '/api/api.yaml')
       }
       eachFile {
         path = name
