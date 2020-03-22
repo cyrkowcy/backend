@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS user_account(
+CREATE TABLE user_account(
     id_user_account SERIAL PRIMARY KEY,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
@@ -7,30 +7,27 @@ CREATE TABLE IF NOT EXISTS user_account(
     active BOOLEAN NOT NULL DEFAULT TRUE,
     disabled BOOLEAN NOT NULL DEFAULT FALSE
 );
-CREATE TABLE IF NOT EXISTS comment_category (
-    id_comment_category SERIAL PRIMARY KEY,
-    name TEXT NOT NULL
-);
 
-CREATE TABLE IF NOT EXISTS role (
+CREATE TABLE role (
     id_role SERIAL PRIMARY KEY,
-    name TEXT NOT NULL
+    name TEXT UNIQUE NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS role_user_account (
+CREATE TABLE role_user_account (
     id_role_user_account SERIAL PRIMARY KEY,
     user_account_id INT NOT NULL,
     role_id INT NOT NULL,
     FOREIGN KEY (user_account_id) REFERENCES user_account(id_user_account),
-    FOREIGN KEY (role_id) REFERENCES role(id_role)
+    FOREIGN KEY (role_id) REFERENCES role(id_role),
+    UNIQUE (id_role_user_account, user_account_id, role_id)
 );
 
-CREATE TABLE IF NOT EXISTS ticket_category (
+CREATE TABLE ticket_category (
     id_ticket_category SERIAL PRIMARY KEY,
     name text NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS ticket (
+CREATE TABLE ticket (
     id_ticket SERIAL PRIMARY KEY,
     user_account_id INT NOT NULL,
     ticket_category_id INT NOT NULL,
@@ -40,7 +37,7 @@ CREATE TABLE IF NOT EXISTS ticket (
     FOREIGN KEY (ticket_category_id) REFERENCES ticket_category(id_ticket_category)
 );
 
-CREATE TABLE IF NOT EXISTS payment_method (
+CREATE TABLE payment_method (
     id_payment_method SERIAL PRIMARY KEY,
     psp_name text NOT NULL,
     token text NOT NULL,
@@ -49,19 +46,19 @@ CREATE TABLE IF NOT EXISTS payment_method (
     FOREIGN KEY (user_account_id) REFERENCES user_account(id_user_account)
 );
 
-CREATE TABLE IF NOT EXISTS point (
+CREATE TABLE point (
     id_point SERIAL PRIMARY KEY,
     coordinates text NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS route (
+CREATE TABLE route (
     id_route SERIAL PRIMARY KEY,
     name text NOT NULL,
     point_id INT NOT NULL,
     FOREIGN KEY (point_id) REFERENCES point(id_point)
 );
 
-CREATE TABLE IF NOT EXISTS trip (
+CREATE TABLE trip (
     id_trip SERIAL PRIMARY KEY,
     user_account_id INT NOT NULL,
     route_id INT NOT NULL,
@@ -73,7 +70,7 @@ CREATE TABLE IF NOT EXISTS trip (
     FOREIGN KEY (route_id) REFERENCES route(id_route)
 );
 
-CREATE TABLE IF NOT EXISTS promotion (
+CREATE TABLE promotion (
     id_promotion SERIAL PRIMARY KEY,
     trip_id INT NOT NULL,
     start_period TIMESTAMPTZ(0) NOT NULL,
@@ -84,7 +81,12 @@ CREATE TABLE IF NOT EXISTS promotion (
     FOREIGN KEY (trip_id) REFERENCES trip(id_trip)
 );
 
-CREATE TABLE IF NOT EXISTS comment_user_account (
+CREATE TABLE comment_category (
+    id_comment_category SERIAL PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE comment_user_account (
     id_comment_user_account SERIAL PRIMARY KEY,
     comment_category_id INT NOT NULL,
     user_account_id INT NOT NULL,
@@ -96,7 +98,7 @@ CREATE TABLE IF NOT EXISTS comment_user_account (
     FOREIGN KEY (trip_id) REFERENCES trip(id_trip)
 );
 
-CREATE TABLE IF not exists trip_user_account (
+CREATE TABLE trip_user_account (
     id_trip_user_account SERIAL PRIMARY KEY,
     trip_id INT NOT NULL,
     user_account_id INT NOT NULL,
@@ -105,14 +107,14 @@ CREATE TABLE IF not exists trip_user_account (
     FOREIGN KEY (user_account_id) REFERENCES user_account(id_user_account)
 );
 
-CREATE TABLE IF NOT EXISTS payment (
+CREATE TABLE payment (
     id_payment SERIAL PRIMARY KEY,
     trip_user_account_id INT NOT NULL,
     paid BOOLEAN DEFAULT FALSE NOT NULL,
     FOREIGN KEY (trip_user_account_id) REFERENCES trip_user_account(id_trip_user_account)
 );
 
-CREATE TABLE IF NOT EXISTS payment_history (
+CREATE TABLE payment_history (
     id_payment_history SERIAL PRIMARY KEY,
     payment_id INT NOT NULL,
     price TEXT NOT NULL,

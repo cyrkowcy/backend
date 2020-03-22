@@ -22,14 +22,22 @@ export DATABASE_USER=postgres
 export DATABASE_PASSWORD=123456
 ./gradlew flywayMigrate
 ```
-(for windows use `set` instead of `export`)
+
+Example for Windows:
+```
+set DATABASE_HOST=127.0.0.1:5432
+set DATABASE_NAME=tourtool
+set DATABASE_USER=postgres
+set DATABASE_PASSWORD=123456
+gradlew flywayMigrate
+```
 
 ### Working with the project
 
 Start app:
 ```
 export DATABASE_HOST=127.0.0.1:5432
-export DATABASE_NAME=table-name
+export DATABASE_NAME=tourtool
 export DATABASE_USER=postgres
 export DATABASE_PASSWORD=123456
 ./gradlew run
