@@ -3,34 +3,25 @@ pipeline {
   stages {
     stage('Prepare') {
       steps {
-        echo 'Preparing...'
         withGradle() {
           sh 'chmod +x gradlew'
         }
-
-        echo 'Preparing ended'
       }
     }
 
     stage('Test') {
       steps {
-        echo 'Start test'
         withGradle() {
           sh './gradlew clean ktlintCheck test --info'
         }
-
-        echo 'End test'
       }
     }
 
     stage('Build jar') {
       steps {
-        echo 'Starting build'
         withGradle() {
-          sh './gradlew clean build'
+          sh './gradlew clean shadowJar'
         }
-
-        echo 'Build ended'
       }
     }
 
@@ -39,13 +30,11 @@ pipeline {
         anyOf {
           branch 'master'
         }
-
       }
       steps {
         withGradle() {
           sh './gradlew flywayMigrate'
         }
-
       }
     }
 
@@ -54,7 +43,6 @@ pipeline {
         anyOf {
           branch 'master'
         }
-
       }
       steps {
         sh 'docker stop backendruntest || true'
@@ -68,7 +56,6 @@ pipeline {
         anyOf {
           branch 'master'
         }
-
       }
       steps {
         dir(path: '/var/lib/jenkins/workspace/backend_master/target/') {
@@ -83,7 +70,6 @@ pipeline {
         anyOf {
           branch 'master'
         }
-
       }
       steps {
         sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendruntest --net netapp -it backendtest'
@@ -95,7 +81,6 @@ pipeline {
         anyOf {
           branch 'master'
         }
-
       }
       steps {
         sh 'docker stop backendrun || true'
@@ -109,7 +94,6 @@ pipeline {
         anyOf {
           branch 'master'
         }
-
       }
       steps {
         dir(path: '/var/lib/jenkins/workspace/backend_master/target/') {
@@ -124,7 +108,6 @@ pipeline {
         anyOf {
           branch 'master'
         }
-
       }
       steps {
         sh 'docker run -d -p 8090:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendrun --net netapp -it backend'
