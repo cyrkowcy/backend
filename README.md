@@ -1,7 +1,7 @@
 # backend
 [![Build Status](http://149.156.146.249:60001/jenkins/job/backend/job/master/badge/icon?style=flat-square)](http://149.156.146.249:60001/jenkins/job/backend/job/master/)
 
-Open [Swagger](https://149.156.146.249:60001/api/swagger/index.html)
+Open [Swagger](http://149.156.146.249:60001/api/swagger/index.html)
 
 ### Setup
 
