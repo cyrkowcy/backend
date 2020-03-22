@@ -4,7 +4,7 @@ import io.vertx.pgclient.PgConnectOptions
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.PoolOptions
 
-fun createDatabaseClient(): PgPool {
+fun createDatabasePool(): PgPool {
   val config = Config.database
   val connectOptions = PgConnectOptions()
     .setHost(config.host)

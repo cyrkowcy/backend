@@ -20,13 +20,19 @@ fun <T> RoutingContext.handleResult(future: Future<T>) {
       }
       else -> {
         val cause = handler.cause()
-        val message = "${cause.javaClass.simpleName}: ${cause.message}"
-        logger.error("Error: $message")
+        logger.error("Error: ${cause.javaClass.simpleName}: ${cause.message}")
         response()
           .setStatusCode(500)
           .putHeader("content-type", contentType)
-          .end(Json.encodePrettily(mapOf("message" to message)))
+          .end(Json.encodePrettily(cause.toErrorResponse()))
       }
     }
   }
+}
+
+private fun Throwable.toErrorResponse(): Map<String, String?> {
+  return mapOf(
+    "error" to javaClass.simpleName,
+    "message" to cause?.message
+  )
 }

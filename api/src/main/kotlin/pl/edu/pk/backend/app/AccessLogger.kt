@@ -6,7 +6,13 @@ import org.apache.logging.log4j.LogManager
 class AccessLogger {
   private val logger = LogManager.getLogger(this::class.java)
 
-  private fun log(context: RoutingContext, timestamp: Long) {
+  fun handle(context: RoutingContext) {
+    context.addBodyEndHandler { log(context) }
+    context.next()
+  }
+
+  private fun log(context: RoutingContext) {
+    val timestamp = System.currentTimeMillis()
     val method = context.request().method()
     val uri = context.request().uri()
     val status = context.request().response().statusCode
@@ -14,20 +20,14 @@ class AccessLogger {
       "%s %s %d - %d ms",
       method, uri, status, System.currentTimeMillis() - timestamp
     )
-    doLog(status, message)
+    logMessage(status, message)
   }
 
-  private fun doLog(status: Int, message: String?) {
+  private fun logMessage(status: Int, message: String) {
     when {
       status >= 500 -> logger.error(message)
       status >= 400 -> logger.warn(message)
       else -> logger.info(message)
     }
-  }
-
-  fun handle(context: RoutingContext) {
-    val timestamp = System.currentTimeMillis()
-    context.addBodyEndHandler { log(context, timestamp) }
-    context.next()
   }
 }

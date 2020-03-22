@@ -9,7 +9,7 @@ object Config {
     val port = addressParts
       .getOrElse(1) { "5432" }
       .toIntOrNull()
-      ?: error("Unable to parse database port from host")
+      ?: error("Unable to parse database port")
     val name = env("DATABASE_NAME")
     val user = env("DATABASE_USER")
     val password = env("DATABASE_PASSWORD")

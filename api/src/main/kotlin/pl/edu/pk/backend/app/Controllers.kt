@@ -8,6 +8,7 @@ class Controllers(services: Services) {
   val statusController by lazy {
     StatusController(services.statusService)
   }
+
   val userController by lazy {
     UserController(services.userService)
   }
