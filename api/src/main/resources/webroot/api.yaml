@@ -1,0 +1,23 @@
+swagger: "2.0"
+info:
+  description: Backsend server documentation
+  version: "1.0.0"
+  title: "Backend"
+host: "149.156.146.249:60001"
+basePath: "/api"
+tags:
+  - name: "user"
+    description: "User managment"
+schemes:
+  - "http"
+paths:
+  /status:
+    get:
+      summary: "Get API status"
+      description: ""
+      operationId: "getStatus"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "OK"

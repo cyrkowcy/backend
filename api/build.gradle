@@ -1,5 +1,6 @@
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'org.hidetake.swagger.generator'
 
 mainClassName = 'pl.edu.pk.backend.MainKt'
 
@@ -18,8 +19,32 @@ dependencies {
   testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
   testCompile "org.junit.jupiter:junit-jupiter-params:$junitVersion"
   testRuntime "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+
+  swaggerUI "org.webjars:swagger-ui:3.17.1"
 }
 
+task copySwaggerUi {
+  doLast {
+    copy {
+      into 'src/main/resources/webroot/swagger/'
+      from(zipTree(configurations.swaggerUI.singleFile)) {
+        exclude '**/*.gz'
+        exclude '**/*.MF'
+        exclude '**/*.xml'
+        exclude '**/*.properties'
+      }
+      includeEmptyDirs = false
+      filter {
+        it.replaceAll('https://petstore.swagger.io/v2/swagger.json', '/api.yaml')
+      }
+      eachFile {
+        path = name
+      }
+    }
+  }
+}
+
+shadowJar.dependsOn copySwaggerUi
 shadowJar {
   archiveName = "backend.jar"
   destinationDirectory = new File("${rootProject.projectDir}/target/")
@@ -27,4 +52,8 @@ shadowJar {
   from('src/main/resources') {
     include '**/*'
   }
+}
+
+clean {
+  delete 'src/main/resources/webroot/swagger'
 }
