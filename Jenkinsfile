@@ -6,6 +6,7 @@ pipeline {
         withGradle() {
           sh 'chmod +x gradlew'
         }
+
       }
     }
 
@@ -14,6 +15,7 @@ pipeline {
         withGradle() {
           sh './gradlew clean ktlintCheck test --info'
         }
+
       }
     }
 
@@ -22,6 +24,7 @@ pipeline {
         withGradle() {
           sh './gradlew clean shadowJar'
         }
+
       }
     }
 
@@ -30,11 +33,13 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         withGradle() {
           sh './gradlew flywayMigrate'
         }
+
       }
     }
 
@@ -43,6 +48,7 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         sh 'docker stop backendruntest || true'
@@ -56,6 +62,7 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         dir(path: '/var/lib/jenkins/workspace/backend_master/target/') {
@@ -70,9 +77,10 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
-        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendruntest --net netapp -it backendtest'
+        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendruntest --restart always --net netapp -it backendtest'
       }
     }
 
@@ -81,6 +89,7 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         sh 'docker stop backendrun || true'
@@ -94,6 +103,7 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
         dir(path: '/var/lib/jenkins/workspace/backend_master/target/') {
@@ -108,9 +118,10 @@ pipeline {
         anyOf {
           branch 'master'
         }
+
       }
       steps {
-        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendrun --net netapp -it backend'
+        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendrun --restart always --net netapp -it backend'
       }
     }
 
