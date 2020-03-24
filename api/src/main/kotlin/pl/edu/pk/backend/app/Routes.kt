@@ -21,7 +21,7 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
     router.post("/login").handler(::postLogin)
   }
 
-  router.route().handler(StaticHandler.create())
+  router.route().handler(StaticHandler.create().setCachingEnabled(false))
 
   return router
 }
