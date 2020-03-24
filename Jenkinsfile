@@ -80,7 +80,7 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendruntest --restart always --net netapp -it backendtest'
+        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET --name backendruntest --restart always --net netapp -it backendtest'
       }
     }
 
@@ -121,7 +121,7 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD --name backendrun --restart always --net netapp -it backend'
+        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET --name backendrun --restart always --net netapp -it backend'
       }
     }
 
@@ -131,5 +131,6 @@ pipeline {
     DATABASE_NAME = 'tourtool'
     DATABASE_USER = 'backend'
     DATABASE_PASSWORD = credentials('database-password')
+    APP_SECRET = credentials('app-secret')
   }
 }
