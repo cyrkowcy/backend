@@ -3,6 +3,7 @@ package pl.edu.pk.backend
 import io.vertx.core.Vertx
 import org.apache.logging.log4j.LogManager
 import pl.edu.pk.backend.app.App
+import pl.edu.pk.backend.app.Config
 import pl.edu.pk.backend.app.Controllers
 import pl.edu.pk.backend.app.createDatabasePool
 import pl.edu.pk.backend.app.createRouter
@@ -14,7 +15,7 @@ fun main() {
   val vertx = Vertx.vertx()
   val database = createDatabasePool()
   val repositories = Repositories(database)
-  val services = Services(repositories)
+  val services = Services(vertx, repositories, Config.appSecret)
   val controllers = Controllers(services)
   val app = App(services, controllers, repositories, database, vertx)
   startApp(app)
