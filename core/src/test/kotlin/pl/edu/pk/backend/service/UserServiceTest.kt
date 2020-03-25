@@ -42,7 +42,7 @@ class UserServiceTest {
     val repo = mockk<UserRepository>()
     every { repo.getUserByEmail(any()) } returns Future.failedFuture(NoSuchResourceException(""))
     every { repo.getUserByEmail(eq("foo@example.com")) } returns Future.succeededFuture(
-      SensitiveUser(1, "", "", "foo@example.com", "", active = true, disabled = false)
+      SensitiveUser(1, "", "", "foo@example.com", "", disabled = false)
     )
     return repo
   }

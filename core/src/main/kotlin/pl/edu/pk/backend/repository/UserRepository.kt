@@ -49,7 +49,6 @@ class UserRepository(private val pool: PgPool) {
       row.getString("last_name"),
       row.getString("email"),
       row.getString("password"),
-      row.getBoolean("active"),
       row.getBoolean("disabled")
     )
   }

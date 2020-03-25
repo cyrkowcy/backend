@@ -13,7 +13,6 @@ data class SensitiveUser(
   val lastName: String,
   val email: String,
   val password: String,
-  val active: Boolean,
   val disabled: Boolean
 ) {
   fun toUser(): User {
