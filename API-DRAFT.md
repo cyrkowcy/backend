@@ -66,7 +66,6 @@ Request:
     "disabled": false
 }
 ```
-
 Response:
 (none)
 
@@ -91,6 +90,34 @@ Response:
 {
   "token": "jwt-token"
 }
+```
+
+`GET /users` - get list of all users
+
+Role: admin
+
+Request  
+(none)
+
+Response
+```json
+[
+  {
+      "firstName": "user",
+      "lastName": "user",
+      "password": "123456",
+      "roles": ["user", "admin", "guide"],
+      "disabled": false
+  },
+  {
+    "firstName": "user",
+    "lastName": "user",
+    "password": "123456",
+    "roles": ["user", "admin", "guide"],
+    "disabled": false
+  },
+  ...
+]
 ```
 
 ## Support ticket management
