@@ -13,8 +13,8 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
   val router = Router.router(vertx)
 
   router.route().handler(AccessLogger()::handle)
-  router.route().handler(BodyHandler.create())
   router.route().handler(createCorsHandler())
+  router.route().handler(BodyHandler.create())
 
   with(controllers.statusController) {
     router.get("/status").handler(::getStatus)
@@ -31,7 +31,7 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
   return router
 }
 
-private fun createCorsHandler(): Handler<RoutingContext>? {
+private fun createCorsHandler(): Handler<RoutingContext> {
   return CorsHandler.create(".*.")
     .allowedMethod(HttpMethod.GET)
     .allowedMethod(HttpMethod.POST)
