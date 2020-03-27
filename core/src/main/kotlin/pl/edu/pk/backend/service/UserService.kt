@@ -127,10 +127,20 @@ class UserService(
     newDisabled: Boolean?,
     newRoles: List<Role>?
   ): Future<Nothing> {
+    if ((newFirstName != null && newFirstName.isBlank()) || (newFirstName != null && newFirstName.isBlank())) {
+      return Future.failedFuture(ValidationException("Invalid name"))
+    }
+    if (newEmail != null && (newEmail.isBlank() || !EmailValidator.getInstance().isValid(newEmail))) {
+      return Future.failedFuture(ValidationException("Invalid email"))
+    }
+    if (newPassword != null && !passwordRegex.matches(newPassword)) {
+      return Future.failedFuture(ValidationException("Invalid password"))
+    }
+    val startFuture = getUserByEmail(email)
     val hashFuture = if (newPassword != null) {
-      hashPassword(newPassword)
+      startFuture.compose { hashPassword(newPassword) }
     } else {
-      Future.succeededFuture<String>(null)
+      startFuture.compose { Future.succeededFuture<String>(null) }
     }
     val finalEmail = newEmail ?: email
     val update = hashFuture.compose { newPasswordHash ->
