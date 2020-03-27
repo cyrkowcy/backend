@@ -13,6 +13,9 @@ private val logger = LogManager.getLogger("Main")
 fun main() {
   logger.info("App started")
   val vertx = Vertx.vertx()
+  vertx.exceptionHandler {
+    logger.error("Uncaught exception", it)
+  }
   val database = createDatabasePool()
   val repositories = Repositories(database)
   val services = Services(vertx, repositories, Config.appSecret)

@@ -8,8 +8,22 @@ import io.vertx.sqlclient.Tuple
 import pl.edu.pk.backend.model.SensitiveUser
 import pl.edu.pk.backend.model.User
 import pl.edu.pk.backend.util.NoSuchResourceException
+import java.util.concurrent.atomic.AtomicInteger
 
 class UserRepository(private val pool: PgPool) {
+  fun getUsers(): Future<List<SensitiveUser>> {
+    val promise = Promise.promise<List<SensitiveUser>>()
+    pool.preparedQuery("SELECT * FROM user_account") { ar ->
+      if (ar.succeeded()) {
+        val rows = ar.result()
+        promise.complete(rows.map(::mapUser))
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
   fun getUserByEmail(email: String): Future<SensitiveUser> {
     val promise = Promise.promise<SensitiveUser>()
     pool.preparedQuery("SELECT * FROM user_account WHERE email=$1", Tuple.of(email)) { ar ->
@@ -34,7 +48,43 @@ class UserRepository(private val pool: PgPool) {
       Tuple.of(firstName, lastName, email, password)
     ) { ar ->
       if (ar.succeeded()) {
-        promise.complete(User(firstName, lastName, email, false))
+        promise.complete(User(firstName, lastName, email, false, emptyList()))
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
+  fun updateUser(
+    targetEmail: String,
+    newFirstName: String?,
+    newLastName: String?,
+    newEmail: String?,
+    newPasswordHash: String?,
+    newDisabled: Boolean?
+  ): Future<Nothing> {
+    val promise = Promise.promise<Nothing>()
+    val counter = AtomicInteger(1)
+    val updates = listOf(
+      Pair("first_name", newFirstName),
+      Pair("last_name", newLastName),
+      Pair("email", newEmail),
+      Pair("password", newPasswordHash),
+      Pair("disabled", newDisabled)
+    ).filter { it.second != null }
+    val setExpr = updates.joinToString(", ") { "${it.first} = $${counter.getAndIncrement()}" }
+    val updateValues = updates
+      .map { it.second }
+      .toMutableList()
+      .apply { add(targetEmail) }
+      .toTypedArray()
+    pool.preparedQuery(
+      "UPDATE user_account SET $setExpr WHERE email = $${counter.getAndIncrement()}",
+      Tuple.wrap(*updateValues)
+    ) { ar ->
+      if (ar.succeeded()) {
+        promise.complete()
       } else {
         promise.fail(ar.cause())
       }
@@ -49,7 +99,8 @@ class UserRepository(private val pool: PgPool) {
       row.getString("last_name"),
       row.getString("email"),
       row.getString("password"),
-      row.getBoolean("disabled")
+      row.getBoolean("disabled"),
+      emptyList()
     )
   }
 }

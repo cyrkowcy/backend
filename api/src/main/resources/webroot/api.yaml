@@ -1,109 +1,188 @@
-swagger: "2.0"
+openapi: 3.0.0
 info:
   description: Backend server documentation
-  version: "1.0.0"
-  title: "Backend"
-host: "149.156.146.249:60001"
-basePath: "/api"
+  version: 1.0.0
+  title: Backend
 tags:
-  - name: "user"
-    description: "User management"
-schemes:
-  - "http"
+  - name: user
+    description: User management
+  - name: status
+    description: API status
 paths:
   /status:
     get:
-      summary: "Get API status"
+      tags:
+        - status
+      summary: Get API status
       description: ""
-      operationId: "getStatus"
-      produces:
-        - "application/json"
+      operationId: getStatus
       responses:
-        200:
-          description: "OK"
-          schema:
-            $ref: '#/definitions/ApiStatus'
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiStatus"
   /login:
     post:
       tags:
-        - "user"
-      summary: "Login as user"
+        - user
+      summary: Login as user
       description: ""
-      operationId: "loginUser"
-      produces:
-        - "application/json"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: "#/definitions/LoginUser"
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUser"
+        required: true
       responses:
-        200:
-          description: "OK"
-          schema:
-            $ref: '#/definitions/BearerToken'
-        400:
-          description: "Bad request"
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BearerToken"
+        "400":
+          description: Bad request
   /user:
     post:
       tags:
-        - "user"
-      summary: "Create new user"
+        - user
+      summary: Create new user
       description: ""
-      operationId: "createUser"
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewUser"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - user
+      summary: Get current user
+      description: ""
+      operationId: getCurrentUser
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request
+  "/user/{email}":
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - user
+      summary: Patch user
+      description: "At least one field is required. Only admin can specify roles and disabled fields.
+Non-admin user can only patch themselves. Admin can patch anyone."
+      operationId: patchUser
       parameters:
-        - in: "body"
-          name: "body"
+        - name: email
+          in: path
+          description: User email
           required: true
           schema:
-            $ref: "#/definitions/NewUser"
-      produces:
-        - "application/json"
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
       responses:
-        200:
-          description: "OK"
-          schema:
-            $ref: '#/definitions/User'
-        400:
-          description: "Bad request"
-definitions:
-  BearerToken:
-    type: "object"
-    properties:
-      token:
-        type: "string"
-  LoginUser:
-    type: "object"
-    properties:
-      email:
-        type: "string"
-      password:
-        type: "string"
-  NewUser:
-    type: "object"
-    properties:
-      firstName:
-        type: "string"
-      lastName:
-        type: "string"
-      email:
-        type: "string"
-      password:
-        type: "string"
-  User:
-    type: "object"
-    properties:
-      firstName:
-        type: "string"
-      lastName:
-        type: "string"
-      email:
-        type: "string"
-      disabled:
-        type: "boolean"
-  ApiStatus:
-    type: "object"
-    properties:
-      status:
-        type: "string"
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+  /users:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - user
+      summary: Get all users
+      description: ""
+      operationId: getUsers
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Users"
+        "400":
+          description: Bad request
+servers:
+  - url: http://149.156.146.249:60001/api
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    BearerToken:
+      type: object
+      properties:
+        token:
+          type: string
+    LoginUser:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    NewUser:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+    Users:
+      type: array
+      items:
+        $ref: "#/components/schemas/User"
+    User:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        disabled:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+    ApiStatus:
+      type: object
+      properties:
+        status:
+          type: string

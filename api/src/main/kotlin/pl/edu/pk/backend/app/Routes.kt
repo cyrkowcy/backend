@@ -8,13 +8,19 @@ import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.CorsHandler
 import io.vertx.ext.web.handler.StaticHandler
+import org.apache.logging.log4j.LogManager
+
+private val logger = LogManager.getLogger("Router")
 
 fun createRouter(vertx: Vertx, controllers: Controllers): Router {
   val router = Router.router(vertx)
-
-  router.route().handler(AccessLogger()::handle)
+  router.errorHandler(500) { rc: RoutingContext ->
+    logger.error("Router handler error", rc.failure())
+  }
+  router.route().handler(AccessLogger())
   router.route().handler(createCorsHandler())
   router.route().handler(BodyHandler.create())
+  router.route().handler(controllers.authorizationController)
 
   with(controllers.statusController) {
     router.get("/status").handler(::getStatus)
@@ -22,8 +28,10 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
 
   with(controllers.userController) {
     router.get("/user").handler(::getUser)
+    router.get("/users").handler(::getUsers)
     router.post("/user").handler(::postUser)
     router.post("/login").handler(::postLogin)
+    router.patch("/user/:email").handler(::patchUser)
   }
 
   router.route().handler(StaticHandler.create().setCachingEnabled(false))

@@ -10,7 +10,7 @@ class Services(private val vertx: Vertx, private val repositories: Repositories,
     StatusService()
   }
   val userService by lazy {
-    UserService(vertx, repositories.userRepository, jwtService)
+    UserService(vertx, repositories.userRepository, repositories.roleUserRepository, jwtService)
   }
   val jwtService by lazy {
     JwtService(jwtSecret)

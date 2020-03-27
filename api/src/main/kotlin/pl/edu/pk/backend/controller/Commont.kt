@@ -13,9 +13,9 @@ private val logger = LogManager.getLogger("handleResult")
 
 private const val contentType = "application/json; charset=utf-8"
 
-fun RoutingContext.failValidation(error: ApiError, details: String = "") {
+fun RoutingContext.failValidation(error: ApiError, details: String = "", code: Int = 400) {
   response()
-    .setStatusCode(400)
+    .setStatusCode(code)
     .putHeader("content-type", contentType)
     .end(
       Json.encodePrettily(
@@ -32,10 +32,11 @@ fun <T> RoutingContext.handleResult(future: Future<T>) {
   future.setHandler { handler ->
     when (handler.succeeded()) {
       true -> {
+        val result = handler.result()?.let { Json.encodePrettily(it) } ?: ""
         response()
           .setStatusCode(200)
           .putHeader("content-type", contentType)
-          .end(Json.encodePrettily(handler.result()))
+          .end(result)
       }
       else -> {
         val cause = handler.cause()

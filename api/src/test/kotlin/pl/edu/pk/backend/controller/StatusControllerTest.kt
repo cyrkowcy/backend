@@ -12,13 +12,13 @@ import pl.edu.pk.backend.service.StatusService
 class StatusControllerTest {
   @Test
   fun `returns status`() {
-    val context = mockk<RoutingContext>(relaxed = true)
+    val ctx = mockk<RoutingContext>(relaxed = true)
     val service = mockk<StatusService>(relaxed = true)
     every { service.getStatus() } returns Future.succeededFuture(ApiStatus())
     val controller = StatusController(service)
 
-    controller.getStatus(context)
+    controller.getStatus(ctx)
 
-    verify { context.response().setStatusCode(200) }
+    verify { ctx.response().setStatusCode(200) }
   }
 }

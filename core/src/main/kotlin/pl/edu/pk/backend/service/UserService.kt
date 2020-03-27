@@ -1,12 +1,16 @@
 package pl.edu.pk.backend.service
 
 import de.mkammerer.argon2.Argon2Factory
+import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.core.Promise
 import io.vertx.core.Vertx
 import org.apache.commons.validator.routines.EmailValidator
 import pl.edu.pk.backend.model.Login
+import pl.edu.pk.backend.model.Role
+import pl.edu.pk.backend.model.SensitiveUser
 import pl.edu.pk.backend.model.User
+import pl.edu.pk.backend.repository.RoleUserRepository
 import pl.edu.pk.backend.repository.UserRepository
 import pl.edu.pk.backend.util.AuthorizationException
 import pl.edu.pk.backend.util.ResourceAlreadyExists
@@ -15,13 +19,29 @@ import pl.edu.pk.backend.util.ValidationException
 class UserService(
   private val vertx: Vertx,
   private val userRepository: UserRepository,
+  private val roleUserRepository: RoleUserRepository,
   private val jwtService: JwtService
 ) {
   private val passwordRegex = "^.{6,}$".toRegex()
   private val argon2 = Argon2Factory.create()
 
+  fun getUsers(): Future<List<User>> {
+    return userRepository.getUsers()
+      .compose { users ->
+        CompositeFuture.all(users.map { user -> enrichWithUserRoles(user) })
+      }.map {
+        it.list<User>()
+      }
+  }
+
   fun getUserByEmail(email: String): Future<User> {
     return userRepository.getUserByEmail(email)
+      .compose { enrichWithUserRoles(it) }
+  }
+
+  private fun enrichWithUserRoles(user: SensitiveUser): Future<User> {
+    return roleUserRepository.getRoles(user.email)
+      .map { user.copy(roles = it) }
       .map { it.toUser() }
   }
 
@@ -47,11 +67,19 @@ class UserService(
     return getUserByEmail(email).compose(
       { Future.failedFuture<User>(ResourceAlreadyExists("User already exists")) },
       {
-        hashPassword(password).compose { hashedPassword ->
-          userRepository.insertUser(firstName, lastName, email, hashedPassword)
-        }
+        hashPassword(password)
+          .compose { hashedPassword ->
+            userRepository.insertUser(firstName, lastName, email, hashedPassword)
+          }
+          .compose { user ->
+            roleUserRepository.addRole(email, Role.User).map { user.copy(roles = listOf(Role.User)) }
+          }
       }
     )
+  }
+
+  fun getRoles(email: String): Future<List<Role>> {
+    return roleUserRepository.getRoles(email)
   }
 
   private fun hashPassword(password: String): Future<String> {
@@ -88,5 +116,34 @@ class UserService(
         }
       })
     return promise.future()
+  }
+
+  fun patchUser(
+    email: String,
+    newFirstName: String?,
+    newLastName: String?,
+    newEmail: String?,
+    newPassword: String?,
+    newDisabled: Boolean?,
+    newRoles: List<Role>?
+  ): Future<Nothing> {
+    val hashFuture = if (newPassword != null) {
+      hashPassword(newPassword)
+    } else {
+      Future.succeededFuture<String>(null)
+    }
+    val finalEmail = newEmail ?: email
+    val update = hashFuture.compose { newPasswordHash ->
+      userRepository.updateUser(email, newFirstName, newLastName, newEmail, newPasswordHash, newDisabled)
+    }
+    if (newRoles == null) {
+      return update
+    }
+    return update.compose { getUserByEmail(finalEmail) }
+      .compose { roleUserRepository.removeRoles(finalEmail) }
+      .compose {
+        CompositeFuture.all(newRoles.map { role -> roleUserRepository.addRole(finalEmail, role) })
+      }
+      .compose { Future.succeededFuture<Nothing>() }
   }
 }

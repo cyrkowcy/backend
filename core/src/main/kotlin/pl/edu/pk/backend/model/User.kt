@@ -4,7 +4,8 @@ data class User(
   val firstName: String,
   val lastName: String,
   val email: String,
-  val disabled: Boolean
+  val disabled: Boolean,
+  val roles: List<Role>
 )
 
 data class SensitiveUser(
@@ -13,9 +14,10 @@ data class SensitiveUser(
   val lastName: String,
   val email: String,
   val password: String,
-  val disabled: Boolean
+  val disabled: Boolean,
+  val roles: List<Role>
 ) {
   fun toUser(): User {
-    return User(firstName, lastName, email, disabled)
+    return User(firstName, lastName, email, disabled, roles)
   }
 }

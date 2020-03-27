@@ -1,21 +1,22 @@
 package pl.edu.pk.backend.app
 
+import io.vertx.core.Handler
 import io.vertx.ext.web.RoutingContext
 import org.apache.logging.log4j.LogManager
 
-class AccessLogger {
+class AccessLogger : Handler<RoutingContext> {
   private val logger = LogManager.getLogger(this::class.java)
 
-  fun handle(context: RoutingContext) {
-    context.addBodyEndHandler { log(context) }
-    context.next()
+  override fun handle(ctx: RoutingContext) {
+    ctx.addBodyEndHandler { log(ctx) }
+    ctx.next()
   }
 
-  private fun log(context: RoutingContext) {
+  private fun log(ctx: RoutingContext) {
     val timestamp = System.currentTimeMillis()
-    val method = context.request().method()
-    val uri = context.request().uri()
-    val status = context.request().response().statusCode
+    val method = ctx.request().method()
+    val uri = ctx.request().uri()
+    val status = ctx.request().response().statusCode
     val message = String.format(
       "%s %s %d - %d ms",
       method, uri, status, System.currentTimeMillis() - timestamp
