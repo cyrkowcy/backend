@@ -127,7 +127,9 @@ class UserService(
     newDisabled: Boolean?,
     newRoles: List<Role>?
   ): Future<Nothing> {
-    if ((newFirstName != null && newFirstName.isBlank()) || (newFirstName != null && newFirstName.isBlank())) {
+    if ((newFirstName != null && newFirstName.isBlank()) ||
+      (newLastName != null && newLastName.isBlank())
+    ) {
       return Future.failedFuture(ValidationException("Invalid name"))
     }
     if (newEmail != null && (newEmail.isBlank() || !EmailValidator.getInstance().isValid(newEmail))) {
