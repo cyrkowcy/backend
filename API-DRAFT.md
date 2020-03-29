@@ -27,11 +27,13 @@ Response:
         {
             "id": 1,
             "closed": false,
+            "author": "user-1",
             "createDate": "2020-01-01"
         },
         {
             "id": 2,
             "closed": false,
+            "author": "user-2",
             "createDate": "2020-01-01"
         }
     ]
@@ -40,9 +42,9 @@ Response:
 
 Only admin can use `all=true`. If true return every ticket regardless of current user.
 
-`POST /ticket` - create new support ticket
+`POST /ticket` - create new support ticket as current user
 
-Role: any
+Role: any (extra conditions apply)
 
 Request:
 ```json
@@ -63,18 +65,15 @@ Role: any (extra conditions apply)
 Request:
 ```json
 {
-  "content": "ticket-text-content"
+  "content": "ticket-text-content",
+  "closed": false
 }
 ```
 
+Both admins and users can close tickets. User can only close their own ticket.
+
 Response:
-```json
-{
-    "id": 1,
-    "closed": false,
-    "createDate": "2020-01-01"
-}
-```
+(none)
 
 User can only modify their own ticket
 
@@ -104,9 +103,9 @@ Response:
 }
 ```
 
-User can only get their own ticket
+User can only get their own ticket. Tickets sorted by created date.
 
-`POST /ticket/{ticket-id}` - add ticket comment
+`POST /ticket/{ticket-id}/comment` - add ticket comment
 
 Role: any (extra conditions apply)
 
@@ -122,25 +121,9 @@ Response:
 
 User can only add comment to their own ticket.
 
-`PATCH /ticket` - update ticket
-
-Role: any (extra conditions apply)
-
-Request:
-```json
-{
-    "closed": false
-}
-```
-
-Response:
-(none)
-
-Both admins and users can close tickets. User can only close their own ticket.
-
 ## Trip authoring
 
-`GET /trip` - get guide added trips
+`GET /trip` - get guide added trips (of current user)
 
 Role: guide
 
@@ -202,7 +185,7 @@ Request:
 Response:
 (none)
 
-Role: guide
+Validate coordinates.
 
 `PATCH /trip/{id}` - modify guide trip
 
@@ -231,6 +214,8 @@ Request:
     }
 }
 ```
+
+Validate coordinates.
 
 Response:
 (none)
