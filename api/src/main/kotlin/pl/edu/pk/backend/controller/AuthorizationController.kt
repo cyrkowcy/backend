@@ -80,3 +80,8 @@ fun RoutingContext.checkCurrentUserHasRole(role: Role): Boolean {
   }
   return true
 }
+
+fun RoutingContext.checkIfCurrentUserHasRole(role: Role): Boolean {
+  val currentRoles = get<List<Role>>(AuthorizationController.CURRENT_USER_ROLES) ?: emptyList()
+  return currentRoles.contains(role)
+}

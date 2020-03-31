@@ -91,16 +91,17 @@ class UserRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
-
-  private fun mapUser(row: Row): SensitiveUser {
-    return SensitiveUser(
-      row.getInteger("id_user_account"),
-      row.getString("first_name"),
-      row.getString("last_name"),
-      row.getString("email"),
-      row.getString("password"),
-      row.getBoolean("disabled"),
-      emptyList()
-    )
+  companion object {
+    fun mapUser(row: Row): SensitiveUser {
+      return SensitiveUser(
+        row.getInteger("id_user_account"),
+        row.getString("first_name"),
+        row.getString("last_name"),
+        row.getString("email"),
+        row.getString("password"),
+        row.getBoolean("disabled"),
+        emptyList()
+      )
+    }
   }
 }
