@@ -7,14 +7,14 @@ import pl.edu.pk.backend.util.ApiError
 
 class TicketController(private val ticketService: TicketService) {
   fun getTickets(ctx: RoutingContext) {
-    if (!ctx.checkCurrentUserHasRole(Role.User)) return
-    var all = "false"
-    try {
-      all = ctx.queryParam("all")[0]
-    } catch (ex: Exception) {
+    if (!ctx.checkCurrentUserHasRole(Role.User)) {
+      return
     }
-    if (all == "true") {
-      if (!ctx.checkCurrentUserHasRole(Role.Admin)) return
+    val all = ctx.queryParam("all").firstOrNull()?.toBoolean()
+    if (all != null && all == true) {
+      if (!ctx.checkCurrentUserHasRole(Role.Admin)) {
+        return
+      }
       ctx.handleResult(ticketService.getTickets())
     } else {
       ctx.handleResult(ticketService.getTicketsWrittenBy(ctx.getCurrentUserEmail()))
@@ -22,15 +22,19 @@ class TicketController(private val ticketService: TicketService) {
   }
 
   fun postTicket(ctx: RoutingContext) {
-    if (!ctx.checkCurrentUserHasRole(Role.User)) return
+    if (!ctx.checkCurrentUserHasRole(Role.User)) {
+      return
+    }
     val body = ctx.safeBodyAsJson() ?: return
     val content = body.getString("content", "")
     val email = ctx.getCurrentUserEmail()
     ctx.handleResult(ticketService.createTicket(email, content))
   }
 
-  fun pathTicket(ctx: RoutingContext) {
-    if (!ctx.checkCurrentUserHasRole(Role.User)) return
+  fun patchTicket(ctx: RoutingContext) {
+    if (!ctx.checkCurrentUserHasRole(Role.User)) {
+      return
+    }
     val ticketId = ctx.pathParam("ticketId")
     val body = ctx.safeBodyAsJson() ?: return
     val newContent: String? = body.getString("content")
@@ -41,9 +45,9 @@ class TicketController(private val ticketService: TicketService) {
       return
     }
     if (ctx.checkIfCurrentUserHasRole(Role.Admin)) {
-      ctx.handleResult(ticketService.pathTicket(ticketId.toInt(), newContent, closed, null))
+      ctx.handleResult(ticketService.patchTicket(ticketId.toInt(), newContent, closed, null))
     } else {
-      ctx.handleResult(ticketService.pathTicket(ticketId.toInt(), newContent, closed, ctx.getCurrentUserEmail()))
+      ctx.handleResult(ticketService.patchTicket(ticketId.toInt(), newContent, closed, ctx.getCurrentUserEmail()))
     }
   }
 }

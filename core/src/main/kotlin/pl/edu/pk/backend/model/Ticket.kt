@@ -23,7 +23,7 @@ data class TicketDto(
       return TicketDto(
         ticket.id,
         ticket.closed,
-        "user_" + ticket.author.id,
+        ticket.author.email,
         ticket.createData.format(formatter))
     }
   }
