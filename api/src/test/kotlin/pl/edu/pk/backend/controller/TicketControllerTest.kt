@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import pl.edu.pk.backend.model.Role
 import pl.edu.pk.backend.service.TicketService
 import pl.edu.pk.backend.util.ValidationException
-import java.lang.StringBuilder
 
 class TicketControllerTest {
   @Test
@@ -30,7 +29,7 @@ class TicketControllerTest {
     controller.postTicket(ctx)
 
     verify { service.createTicket("test@example.com", "Ala ma kota") }
-    verify { ctx.response().setStatusCode(200) }
+    verify { ctx.response().statusCode = 200 }
   }
 
   @Test
@@ -52,9 +51,8 @@ class TicketControllerTest {
     controller.postTicket(ctx)
 
     verify { service.createTicket("test@example.com", toLongString.toString()) }
-    verify { ctx.response().setStatusCode(400) }
+    verify { ctx.response().statusCode = 400 }
   }
-
 
   @Test
   fun `empty content`() {
@@ -73,7 +71,6 @@ class TicketControllerTest {
     controller.postTicket(ctx)
 
     verify { service.createTicket("test@example.com", "") }
-    verify { ctx.response().setStatusCode(400) }
+    verify { ctx.response().statusCode = 400 }
   }
-
 }
