@@ -13,46 +13,46 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class TicketRepository(private val pool: PgPool) {
 
-  fun getAllTickets() : Future<List<Ticket>> {
+  fun getAllTickets(): Future<List<Ticket>> {
     val query = "SELECT * FROM ticket t " +
       "LEFT JOIN user_account u ON t.user_account_id = u.id_user_account"
     return getTickets(query, Tuple.tuple())
   }
 
-  fun getTicketsByUserEmail(email: String) : Future<List<Ticket>> {
+  fun getTicketsByUserEmail(email: String): Future<List<Ticket>> {
     val query = "SELECT * FROM ticket t " +
       "LEFT JOIN user_account u ON t.user_account_id = u.id_user_account WHERE u.email = $1"
     return getTickets(query, Tuple.of(email))
   }
 
-  private fun getTickets(query: String, tuple: Tuple?) : Future<List<Ticket>>{
+  private fun getTickets(query: String, tuple: Tuple?): Future<List<Ticket>> {
     val promise = Promise.promise<List<Ticket>>()
     pool.preparedQuery(query, tuple) { ar ->
-      if(ar.succeeded()){
+      if (ar.succeeded()) {
         val rows = ar.result()
         promise.complete(rows.map(::mapTicket))
-      }else{
+      } else {
         promise.fail(ar.cause())
       }
     }
     return promise.future()
   }
 
-  fun insertTicket(userId: Int, content: String) : Future<JsonObject> {
+  fun insertTicket(userId: Int, content: String): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
     val createTime = OffsetDateTime.now()
     pool.preparedQuery("INSERT INTO ticket (user_account_id, content, create_date) VALUES($1, $2, $3)",
       Tuple.of(userId, content, createTime)) { ar ->
-      if(ar.succeeded()){
+      if (ar.succeeded()) {
         promise.complete(JsonObject().put("content", content))
-      }else{
+      } else {
         promise.fail(ar.cause())
       }
     }
     return promise.future()
   }
 
-  fun update(ticketId: Int, newContent: String?, closed: Boolean?, email: String?) : Future<JsonObject> {
+  fun update(ticketId: Int, newContent: String?, closed: Boolean?, email: String?): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
     val counter = AtomicInteger(1)
     val updates = listOf(
@@ -64,8 +64,8 @@ class TicketRepository(private val pool: PgPool) {
       .map { it.second }
     var oneUser = ""
     val tuple = Tuple.wrap(updateValues).addInteger(ticketId)
-    if(email != null){
-      oneUser = "and user_account_id = id_user_account and email = $${counter.get()+1}"
+    if (email != null) {
+      oneUser = "and user_account_id = id_user_account and email = $${counter.get() + 1}"
       tuple.addString(email)
     }
     pool.preparedQuery(
@@ -75,9 +75,9 @@ class TicketRepository(private val pool: PgPool) {
       tuple) { ar ->
       if (ar.succeeded()) {
         val counter = ar.result().first().getValue(0)
-        if(counter.toString() == "0"){
+        if (counter.toString() == "0") {
           promise.fail(NoSuchResourceException("No ticket with id $ticketId or you don't have rights to modify it."))
-        }else {
+        } else {
           promise.complete(JsonObject()
             .put("content", newContent)
             .put("closed", closed))

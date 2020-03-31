@@ -91,6 +91,7 @@ class UserRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
+
   companion object {
     fun mapUser(row: Row): SensitiveUser {
       return SensitiveUser(

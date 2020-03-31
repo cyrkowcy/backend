@@ -6,9 +6,9 @@ import java.time.format.DateTimeFormatter
 data class Ticket(
   val id: Int,
   val author: SensitiveUser,
-  val content : String,
-  val closed : Boolean,
-  val createData : OffsetDateTime
+  val content: String,
+  val closed: Boolean,
+  val createData: OffsetDateTime
 )
 
 data class TicketDto(

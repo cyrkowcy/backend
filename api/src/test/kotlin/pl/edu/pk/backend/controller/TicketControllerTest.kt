@@ -20,7 +20,7 @@ class TicketControllerTest {
     val controller = TicketController(service)
     every { ctx.get<String>("currentUserEmail") } returns "test@example.com"
     every { service.createTicket(any(), any()) } returns
-    Future.succeededFuture(JsonObject())
+      Future.succeededFuture(JsonObject())
     every { ctx.get<List<Role>>("currentUserRoles") } returns listOf(Role.User)
     every { ctx.bodyAsJson } returns JsonObject(
       mapOf(
@@ -34,16 +34,16 @@ class TicketControllerTest {
   }
 
   @Test
-  fun `too long content`(){
+  fun `too long content`() {
     val ctx = mockk<RoutingContext>(relaxed = true)
     val service = mockk<TicketService>(relaxed = true)
     val controller = TicketController(service)
     val toLongString = StringBuilder()
-    for(x in 0..1001) toLongString.append("a")
+    for (x in 0..1001) toLongString.append("a")
     every { ctx.get<String>("currentUserEmail") } returns "test@example.com"
     every { ctx.get<List<Role>>("currentUserRoles") } returns listOf(Role.User)
     every { service.createTicket(any(), any()) } returns
-     Future.failedFuture(ValidationException(""))
+      Future.failedFuture(ValidationException(""))
     every { ctx.bodyAsJson } returns JsonObject(
       mapOf(
         "content" to toLongString.toString()
@@ -51,13 +51,13 @@ class TicketControllerTest {
     )
     controller.postTicket(ctx)
 
-    verify { service.createTicket("test@example.com", toLongString.toString())}
-    verify { ctx.response().setStatusCode(400)}
+    verify { service.createTicket("test@example.com", toLongString.toString()) }
+    verify { ctx.response().setStatusCode(400) }
   }
 
 
   @Test
-  fun `empty content`(){
+  fun `empty content`() {
     val ctx = mockk<RoutingContext>(relaxed = true)
     val service = mockk<TicketService>(relaxed = true)
     val controller = TicketController(service)
@@ -72,8 +72,8 @@ class TicketControllerTest {
     )
     controller.postTicket(ctx)
 
-    verify { service.createTicket("test@example.com", "")}
-    verify { ctx.response().setStatusCode(400)}
+    verify { service.createTicket("test@example.com", "") }
+    verify { ctx.response().setStatusCode(400) }
   }
 
 }
