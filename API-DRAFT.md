@@ -27,13 +27,13 @@ Response:
         {
             "id": 1,
             "closed": false,
-            "author": "user-1",
+            "author": "user-1@example.com",
             "createDate": "2020-01-01"
         },
         {
             "id": 2,
             "closed": false,
-            "author": "user-2",
+            "author": "user-2@example.com",
             "createDate": "2020-01-01"
         }
     ]
@@ -93,11 +93,11 @@ Response:
     "comments": [
         {
           "content": "comment-text",
-          "author": "user-1"
+          "author": "user-1@example.com"
         },
         {
           "content": "comment-text-2",
-          "author": "admin-1"
+          "author": "admin-1@example.com"
         }
     ]
 }
@@ -136,7 +136,7 @@ Response:
     "trips": [
         {
             "cost": 123,
-            "guide": "guide-1",
+            "guide": "guide-1@example.com",
             "description": 123,
             "peopleLimit": 10,
             "dateTrip": "2020-01-01",
@@ -144,7 +144,7 @@ Response:
         },
         {
             "cost": 123,
-            "guide": "guide-1",
+            "guide": "guide-1@example.com",
             "description": 123,
             "peopleLimit": 10,
             "dateTrip": "2020-01-01",
@@ -235,11 +235,11 @@ Response:
 {
     "comments": [
         {
-            "author": "user-1",
+            "author": "user-1@example.com",
             "comment": "text"
         },
         {
-            "author": "user-2",
+            "author": "user-2@example.com",
             "comment": "text"
         }
     ]
