@@ -29,5 +29,4 @@ class TicketService(private val ticketRepository: TicketRepository, private val 
     }
     return ticketRepository.update(ticketId, content, closed, email)
   }
-
 }

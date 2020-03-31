@@ -70,7 +70,8 @@ class TicketRepository(private val pool: PgPool) {
     }
     pool.preparedQuery(
       "WITH rows AS(" +
-        "UPDATE ticket SET $setExpr FROM user_account WHERE id_ticket = $${counter.getAndIncrement()} $oneUser RETURNING 1)" +
+        "UPDATE ticket SET $setExpr FROM user_account WHERE id_ticket = $${counter.getAndIncrement()} $oneUser" +
+        " RETURNING 1)" +
         "SELECT COUNT(*) FROM rows",
       tuple) { ar ->
       if (ar.succeeded()) {
