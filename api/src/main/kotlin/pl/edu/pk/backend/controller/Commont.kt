@@ -73,7 +73,7 @@ private fun Throwable.toErrorResponse(): Map<String, String?> {
 
 fun RoutingContext.safeBodyAsJson(): JsonObject? {
   return try {
-    bodyAsJson
+    bodyAsJson ?: throw DecodeException("Missing body")
   } catch (e: DecodeException) {
     failValidation(ApiError.Body, e.message ?: "")
     return null
