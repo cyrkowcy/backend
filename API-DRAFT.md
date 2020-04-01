@@ -9,73 +9,11 @@ A disabled user is considered to have role "none".
 
 ## User management
 
-Endpoints implemented - see in Swagger.
+See already implemented endpoints in Swagger.
 
 ## Support ticket management
 
-`GET /ticket?all=false` - get support tickets
-
-Role: any (extra conditions apply)
-
-Request:
-(none)
-
-Response:
-```json
-{
-    "tickets": [
-        {
-            "id": 1,
-            "closed": false,
-            "author": "user-1@example.com",
-            "createDate": "2020-01-01"
-        },
-        {
-            "id": 2,
-            "closed": false,
-            "author": "user-2@example.com",
-            "createDate": "2020-01-01"
-        }
-    ]
-}
-```
-
-Only admin can use `all=true`. If true return every ticket regardless of current user.
-
-`POST /ticket` - create new support ticket as current user
-
-Role: any (extra conditions apply)
-
-Request:
-```json
-{
-  "content": "ticket-text-content"
-}
-```
-
-Response:
-(none)
-
-Content limited to 1000 characters.
-
-`PATCH /ticket/{ticket-id}` - modify ticket
-
-Role: any (extra conditions apply)
-
-Request:
-```json
-{
-  "content": "ticket-text-content",
-  "closed": false
-}
-```
-
-Both admins and users can close tickets. User can only close their own ticket.
-
-Response:
-(none)
-
-User can only modify their own ticket
+See already implemented endpoints in Swagger.
 
 `GET /ticket/{ticket-id}` - get ticket details
 

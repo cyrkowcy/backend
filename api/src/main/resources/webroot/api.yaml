@@ -139,24 +139,24 @@ Non-admin user can only patch themselves. Admin can patch anyone."
       tags:
         - ticket
       summary: Get current user tickets
+      description: Only admin can use all=true. If true return every ticket regardless of current user.
       parameters:
         - name: all
           in: query
-          requied: false
+          required: false
           description: "Return all tickets if all is true and current user role is admin"
           schema:
             type: boolean
-      description: ""
       operationId: getTickets
-      response:
+      responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Tickets"
-          "400":
-            description: Bad request
+        "400":
+          description: Bad request
     post:
       security:
         - bearerAuth: []
@@ -169,16 +169,14 @@ Non-admin user can only patch themselves. Admin can patch anyone."
         content:
           application/json:
             schema:
-              content:
-                type: string
-      response:
+              $ref: '#/components/schemas/NewTicket'
+      responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                content:
-                  type: string
+                $ref: '#/components/schemas/NewTicket'
         "400":
           description: Bad request
   /ticket/{ticketId}:
@@ -197,18 +195,12 @@ Non-admin user can only patch themselves. Admin can patch anyone."
           description: ticket id
           required: true
           schema:
-            type: int
+            type: integer
       requestBody:
         content:
           application/json:
             schema:
-              content:
-                type: string
-              closed:
-                type: boolean
-              requied:
-                - content
-                - closed
+              $ref: '#/components/schemas/PatchTicket'
         required: true
       responses:
         "200":
@@ -216,10 +208,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
           content:
             application/json:
               schema:
-                content:
-                  type: string
-                closed:
-                  type: boolean
+                $ref: '#/components/schemas/PatchTicket'
         "400":
           description: Bad request
 
@@ -289,6 +278,23 @@ components:
           type: string
         create_data:
           type: string
+    NewTicket:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+    PatchTicket:
+      type: object
+      properties:
+        content:
+          type: string
+        closed:
+          type: boolean
+      required:
+        - content
+        - closed
     ApiStatus:
       type: object
       properties:
