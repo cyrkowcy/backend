@@ -8,6 +8,8 @@ tags:
     description: User management
   - name: status
     description: API status
+  - name: ticket
+    description: Ticket managment
 paths:
   /status:
     get:
@@ -130,6 +132,97 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: "#/components/schemas/Users"
         "400":
           description: Bad request
+  /ticket:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - ticket
+      summary: Get current user tickets
+      parameters:
+        - name: all
+          in: query
+          requied: false
+          description: "Return all tickets if all is true and current user role is admin"
+          schema:
+            type: boolean
+      description: ""
+      operationId: getTickets
+      response:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tickets"
+          "400":
+            description: Bad request
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - ticket
+      summary: Create new ticket
+      description: "Create new ticket which author is logged user"
+      operationId: createTicket
+      requestBody:
+        content:
+          application/json:
+            schema:
+              content:
+                type: string
+      response:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                content:
+                  type: string
+        "400":
+          description: Bad request
+  /ticket/{ticketId}:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - ticket
+      summary: Patch ticket
+      description: "At least one field is required. Non-admin user can only patch themselves.
+       Admin can patch anyone."
+      operationId: patchTicket
+      parameters:
+        - name: ticketId
+          in: path
+          description: ticket id
+          required: true
+          schema:
+            type: int
+      requestBody:
+        content:
+          application/json:
+            schema:
+              content:
+                type: string
+              closed:
+                type: boolean
+              requied:
+                - content
+                - closed
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                content:
+                  type: string
+                closed:
+                  type: boolean
+        "400":
+          description: Bad request
+
 servers:
   - url: http://149.156.146.249:60001/api
 components:
@@ -181,6 +274,21 @@ components:
           type: array
           items:
             type: string
+    Tickets:
+      type: array
+      items:
+        $ref: "#/components/schemas/Ticket"
+    Ticket:
+      type: object
+      properties:
+        id:
+          type: integer
+        closed:
+          type: boolean
+        author:
+          type: string
+        create_data:
+          type: string
     ApiStatus:
       type: object
       properties:

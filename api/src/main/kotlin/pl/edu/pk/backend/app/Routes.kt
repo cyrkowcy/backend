@@ -34,6 +34,12 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
     router.patch("/user/:email").handler(::patchUser)
   }
 
+  with(controllers.ticketController) {
+    router.get("/ticket").handler(::getTickets)
+    router.post("/ticket").handler(::postTicket)
+    router.patch("/ticket/:ticketId").handler(::patchTicket)
+  }
+
   router.route().handler(StaticHandler.create().setCachingEnabled(false))
 
   return router
