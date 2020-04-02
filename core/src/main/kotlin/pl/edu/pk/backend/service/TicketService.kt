@@ -29,7 +29,8 @@ class TicketService(
   fun getTicketWrittenBy(email: String, ticketId: Int): Future<TicketWithComment> {
     return ticketRepository.getTicketByEmail(email, ticketId)
       .compose {
-        enrichTicketWithComment(it)}
+        enrichTicketWithComment(it)
+      }
   }
 
   private fun enrichTicketWithComment(ticket: Ticket): Future<TicketWithComment> {
@@ -62,9 +63,11 @@ class TicketService(
     return ticketRepository.getTicket(ticketId)
       .compose { ticket ->
         if (!isAdmin && ticket.author.email != email) {
-          Future.failedFuture(AuthorizationException("You don't have permission to create comment into ticket: $ticketId"))
+          Future.failedFuture(AuthorizationException("You don't have permission " +
+            "to create comment into ticket: $ticketId"))
         } else {
-          userRepository.getUserByEmail(email).compose { ticketCommentRepository.insertComment(ticketId, content, it.id) }
+          userRepository.getUserByEmail(email)
+            .compose { ticketCommentRepository.insertComment(ticketId, content, it.id) }
         }
       }
   }
