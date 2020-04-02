@@ -75,5 +75,4 @@ class TicketController(private val ticketService: TicketService) {
       ctx.handleResult(ticketService.patchTicket(ticketId.toInt(), newContent, closed, ctx.getCurrentUserEmail()))
     }
   }
-
 }
