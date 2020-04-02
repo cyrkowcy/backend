@@ -14,7 +14,8 @@ import pl.edu.pk.backend.util.ValidationException
 class TicketService(
   private val ticketRepository: TicketRepository,
   private val userRepository: UserRepository,
-  private val ticketCommentRepository: TicketCommentRepository) {
+  private val ticketCommentRepository: TicketCommentRepository
+) {
 
   fun getTickets(): Future<List<TicketDto>> {
     return ticketRepository.getAllTickets()
