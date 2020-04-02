@@ -17,6 +17,6 @@ class Services(private val vertx: Vertx, private val repositories: Repositories,
     JwtService(jwtSecret)
   }
   val ticketService by lazy {
-    TicketService(repositories.ticketRepository, repositories.userRepository)
+    TicketService(repositories.ticketRepository, repositories.userRepository, repositories.ticketCommentRepository)
   }
 }
