@@ -38,6 +38,35 @@ class TicketRepository(private val pool: PgPool) {
     return promise.future()
   }
 
+  fun getTicket(ticketId: Int): Future<Ticket> {
+    val query = "SELECT * FROM ticket t " +
+      "LEFT JOIN user_account u ON t.user_account_id = u.id_user_account WHERE t.id_ticket = $1"
+    return getTicket(query, Tuple.of(ticketId))
+  }
+
+  fun getTicketByEmail(email: String, ticketId: Int): Future<Ticket> {
+    val query = "SELECT * FROM ticket t " +
+      "LEFT JOIN user_account u ON t.user_account_id = u.id_user_account WHERE t.id_ticket = $1 and u.email = $2"
+    return getTicket(query, Tuple.of(ticketId, email))
+  }
+
+  private fun getTicket(query: String, tuple: Tuple): Future<Ticket> {
+    val promise = Promise.promise<Ticket>()
+    pool.preparedQuery(query, tuple) { ar ->
+      if (ar.succeeded()) {
+        val rows = ar.result()
+        if (rows.size() == 0) {
+          promise.fail(NoSuchResourceException("No such ticket with id: ${tuple.getInteger(0)}"))
+        } else {
+          promise.complete(mapTicket(rows.first()))
+        }
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
   fun insertTicket(userId: Int, content: String): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
     val createTime = OffsetDateTime.now()
@@ -90,13 +119,16 @@ class TicketRepository(private val pool: PgPool) {
     return promise.future()
   }
 
-  fun mapTicket(row: Row): Ticket {
-    return Ticket(
-      row.getInteger("id_ticket"),
-      UserRepository.mapUser(row),
-      row.getString("content"),
-      row.getBoolean("closed"),
-      row.getOffsetDateTime("create_date")
-    )
+  companion object {
+    fun mapTicket(row: Row): Ticket {
+      return Ticket(
+        row.getInteger("id_ticket"),
+        UserRepository.mapUser(row),
+        row.getString("content"),
+        row.getBoolean("closed"),
+        row.getOffsetDateTime("create_date"),
+        emptyList()
+      )
+    }
   }
 }

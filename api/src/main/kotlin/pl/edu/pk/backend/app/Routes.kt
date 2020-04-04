@@ -36,7 +36,9 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
 
   with(controllers.ticketController) {
     router.get("/ticket").handler(::getTickets)
+    router.get("/ticket/:ticketId").handler(::getTicket)
     router.post("/ticket").handler(::postTicket)
+    router.post("/ticket/:ticketId/comment").handler(::postComment)
     router.patch("/ticket/:ticketId").handler(::patchTicket)
   }
 

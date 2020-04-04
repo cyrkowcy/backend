@@ -180,6 +180,30 @@ Non-admin user can only patch themselves. Admin can patch anyone."
         "400":
           description: Bad request
   /ticket/{ticketId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - ticket
+      summary: Get ticket
+      description: "User can only get their own tickets"
+      operationId: getTicket
+      parameters:
+        - name: ticketId
+          in: path
+          description: ticket id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketWithComments'
+        "400":
+          description: "Bad request"
     patch:
       security:
         - bearerAuth: []
@@ -211,7 +235,36 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: '#/components/schemas/PatchTicket'
         "400":
           description: Bad request
-
+  /ticket/{ticketId}/comment:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - ticket
+      summary: Create new comment
+      description: "Users can only add comments to their own tickets"
+      parameters:
+        - name: ticketId
+          in: path
+          description: ticket id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewComment'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewComment'
+        "400":
+          description: Bad request
 servers:
   - url: http://149.156.146.249:60001/api
 components:
@@ -295,8 +348,36 @@ components:
       required:
         - content
         - closed
+    Comments:
+      type: array
+      items:
+        $ref: '#/components/schemas/Comment'
+    Comment:
+      type: object
+      properties:
+        content:
+          type: string
+        author:
+          type: string
+    NewComment:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+    TicketWithComments:
+      type: object
+      properties:
+        ticket:
+          $ref: '#/components/schemas/Ticket'
+        comments:
+          $ref: '#/components/schemas/Comments'
     ApiStatus:
       type: object
       properties:
         status:
           type: string
+
+
+
