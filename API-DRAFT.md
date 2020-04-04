@@ -7,57 +7,12 @@ guide or admin.
 
 A disabled user is considered to have role "none".
 
-## User management
+## Already implemented endpoints
 
-See already implemented endpoints in Swagger.
+See implemented endpoints in Swagger:
 
-## Support ticket management
-
-See already implemented endpoints in Swagger.
-
-`GET /ticket/{ticket-id}` - get ticket details
-
-Role: any (extra conditions apply)
-
-Request:
-(none)
-
-Response:
-```json
-{
-    "id": 1,
-    "closed": false,
-    "createDate": "2020-01-01",
-    "comments": [
-        {
-          "content": "comment-text",
-          "author": "user-1@example.com"
-        },
-        {
-          "content": "comment-text-2",
-          "author": "admin-1@example.com"
-        }
-    ]
-}
-```
-
-User can only get their own ticket. Tickets sorted by created date.
-
-`POST /ticket/{ticket-id}/comment` - add ticket comment
-
-Role: any (extra conditions apply)
-
-Request:
-```json
-{
-    "comment": "comment-text"
-}
-```
-
-Response:
-(none) 
-
-User can only add comment to their own ticket.
+- User management
+- Support ticket management
 
 ## Trip authoring
 
