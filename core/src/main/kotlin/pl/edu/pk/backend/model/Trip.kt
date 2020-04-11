@@ -5,20 +5,20 @@ import java.time.format.DateTimeFormatter
 
 
 data class Trip (
-  val id_trip: Int,
-  val user_account_id: SensitiveUser,
-  val route_id: Int,
+  val idTrip: Int,
+  val userAccountId: SensitiveUser,
+  val routeId: Int,
   val cost: String,
   val description: String,
-  val people_limit: Int,
-  val date_trip: OffsetDateTime,
+  val peopleLimit: Int,
+  val dateTrip: OffsetDateTime,
   val active: Boolean
 )
 
 data class TripDto (
-  val id_trip: Int,
+  val idTrip: Int,
   val author: String,
-  val date_trip: String,
+  val dateTrip: String,
   val description: String,
   val active: Boolean
 ) {
@@ -26,10 +26,10 @@ data class TripDto (
     fun from(trip: Trip): TripDto {
       val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
       return TripDto(
-        trip.id_trip,
-        trip.user_account_id.email,
+        trip.idTrip,
+        trip.userAccountId.email,
         trip.description,
-        trip.date_trip.format(formatter),
+        trip.dateTrip.format(formatter),
         trip.active
       )
     }

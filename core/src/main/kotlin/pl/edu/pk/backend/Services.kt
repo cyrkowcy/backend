@@ -1,10 +1,7 @@
 package pl.edu.pk.backend
 
 import io.vertx.core.Vertx
-import pl.edu.pk.backend.service.JwtService
-import pl.edu.pk.backend.service.StatusService
-import pl.edu.pk.backend.service.TicketService
-import pl.edu.pk.backend.service.UserService
+import pl.edu.pk.backend.service.*
 
 class Services(private val vertx: Vertx, private val repositories: Repositories, private val jwtSecret: String) {
   val statusService by lazy {
@@ -18,5 +15,9 @@ class Services(private val vertx: Vertx, private val repositories: Repositories,
   }
   val ticketService by lazy {
     TicketService(repositories.ticketRepository, repositories.userRepository, repositories.ticketCommentRepository)
+  }
+
+  val tripService by lazy {
+    TripService(repositories.tripRepository, repositories.userRepository)
   }
 }
