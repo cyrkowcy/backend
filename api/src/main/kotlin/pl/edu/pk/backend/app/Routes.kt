@@ -42,6 +42,13 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
     router.patch("/ticket/:ticketId").handler(::patchTicket)
   }
 
+  with(controllers.tripController) {
+    router.get("/trips").handler(::getTrips)
+    router.get("/trip/:tripId").handler(::getTrip)
+    router.post("/trip").handler(::postTrip)
+    router.patch("/trip/:tripId").handler(::patchTrip)
+  }
+
   router.route().handler(StaticHandler.create().setCachingEnabled(false))
 
   return router
