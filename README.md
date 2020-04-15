@@ -62,3 +62,4 @@ Build fat jar:
 ```
 ./gradlew shadowJar
 ```
+
