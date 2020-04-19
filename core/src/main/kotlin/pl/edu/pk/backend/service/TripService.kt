@@ -82,31 +82,31 @@ class TripService(
         return Future.failedFuture(ValidationException("Wrong date."))
     }
 
-    if((newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null || active != null)
+    if ((newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null || active != null)
       && (newRouteName != null || newRouteName != null || newFirstOrderPosition != null || newSecondOrderPosition != null)) {
-      if (newRouteName != null){
+      if (newRouteName != null) {
         tripRepository.updateRoute(newRouteName, tripId)
       }
-      if(newFirstOrderPosition != null) {
+      if (newFirstOrderPosition != null) {
         tripRepository.updateCoordinate(newFirstOrderPosition, tripId, 1)
       }
-      if(newSecondOrderPosition != null){
-         tripRepository.updateCoordinate(newSecondOrderPosition, tripId,2)
+      if (newSecondOrderPosition != null) {
+        tripRepository.updateCoordinate(newSecondOrderPosition, tripId, 2)
       }
       return tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
     }
 
-    if(newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null || active != null) {
+    if (newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null || active != null) {
       return tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
     }
-    if(newRouteName != null) {
+    if (newRouteName != null) {
       return tripRepository.updateRoute(newRouteName, tripId)
     }
-    if(newFirstOrderPosition != null){
-      return tripRepository.updateCoordinate(newFirstOrderPosition, tripId,1)
+    if (newFirstOrderPosition != null) {
+      return tripRepository.updateCoordinate(newFirstOrderPosition, tripId, 1)
     }
-    if(newSecondOrderPosition != null){
-      return tripRepository.updateCoordinate(newSecondOrderPosition, tripId,2)
+    if (newSecondOrderPosition != null) {
+      return tripRepository.updateCoordinate(newSecondOrderPosition, tripId, 2)
     }
     return Future.future()
   }

@@ -38,7 +38,15 @@ class TripController(private val tripService: TripService) {
     val routeName: String = body.getString("routeName", "")
     val firstOrderPosition = body.getString("firstCoordinates", "")
     val secondOrderPosition = body.getString("secondCoordinates", "")
-    ctx.handleResult(tripService.createTrip(cost, description, peopleLimit, dateTrip, active, routeName, firstOrderPosition, secondOrderPosition, ctx.getCurrentUserEmail()))
+    ctx.handleResult(tripService.createTrip(cost,
+      description,
+      peopleLimit,
+      dateTrip,
+      active,
+      routeName,
+      firstOrderPosition,
+      secondOrderPosition,
+      ctx.getCurrentUserEmail()))
   }
 
   fun patchTrip(ctx: RoutingContext) {
@@ -55,7 +63,15 @@ class TripController(private val tripService: TripService) {
     val newRouteName: String? = body.getString("routeName")
     val newFirstOrderPosition: String? = body.getString("firstCoordinates")
     val newSecondOrderPosition: String? = body.getString("secondCoordinates")
-    if (listOf(newCost, newDescription, newRouteName, newPeopleLimit, newDateTrip, active, newRouteName, newFirstOrderPosition, newSecondOrderPosition).all { it == null }) {
+    if (listOf(newCost,
+        newDescription,
+        newRouteName,
+        newPeopleLimit,
+        newDateTrip,
+        active,
+        newRouteName,
+        newFirstOrderPosition,
+        newSecondOrderPosition).all { it == null }) {
       ctx.failValidation(ApiError.Body, "At least one parameter is required for trip patch")
       return
     }

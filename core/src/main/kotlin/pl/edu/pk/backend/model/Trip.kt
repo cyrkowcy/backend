@@ -4,7 +4,7 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 
-data class Trip (
+data class Trip(
   val idTrip: Int,
   val userAccountId: SensitiveUser,
   val routeId: Int,
@@ -15,7 +15,7 @@ data class Trip (
   val active: Boolean
 )
 
-data class TripDto (
+data class TripDto(
   val idTrip: Int,
   val routeId: Int,
   val cost: String,
