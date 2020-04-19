@@ -2,11 +2,7 @@ package pl.edu.pk.backend
 
 import io.vertx.core.Vertx
 import org.apache.logging.log4j.LogManager
-import pl.edu.pk.backend.app.App
-import pl.edu.pk.backend.app.Config
-import pl.edu.pk.backend.app.Controllers
-import pl.edu.pk.backend.app.createDatabasePool
-import pl.edu.pk.backend.app.createRouter
+import pl.edu.pk.backend.app.*
 
 private val logger = LogManager.getLogger("Main")
 
@@ -21,6 +17,7 @@ fun main() {
   val services = Services(vertx, repositories, Config.appSecret)
   val controllers = Controllers(services)
   val app = App(services, controllers, repositories, database, vertx)
+  InitDatabase(services).initDatabase()
   startApp(app)
 }
 
