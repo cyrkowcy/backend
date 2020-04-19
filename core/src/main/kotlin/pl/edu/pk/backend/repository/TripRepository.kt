@@ -2,21 +2,19 @@ package pl.edu.pk.backend.repository
 
 import io.vertx.core.Future
 import io.vertx.core.Promise
+import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.Tuple
 import pl.edu.pk.backend.model.Trip
 import pl.edu.pk.backend.util.NoSuchResourceException
+import java.text.FieldPosition
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
 class TripRepository(private val pool: PgPool) {
-
-  private fun getId(email: String) {
-    val query = "SELECT id_user_account FROM user_account  u WHERE u.email=$1"
-  }
 
   fun getAllTrips(): Future<List<Trip>> {
     val query = "SELECT * FROM trip t"
@@ -40,11 +38,6 @@ class TripRepository(private val pool: PgPool) {
       }
     }
     return promise.future()
-  }
-
-  fun getTripById(email: String, tripId: Int): Future<Trip> {
-    val query = "SELECT * FROM trip t WHERE t.id_trip = $1"
-    return getTrip(query, Tuple.of(tripId))
   }
 
   fun getTripByEmail(email: String, ticketId: Int): Future<Trip> {
@@ -73,15 +66,49 @@ class TripRepository(private val pool: PgPool) {
   fun insertTrip(
     userId: Int,
     cost: String,
-    routeId: Int,
     description: String,
     peopleLimit: Int,
-    date: String
+    date: String,
+    active: Boolean,
+    routeName: String,
+    firstOrderPosition: String,
+    secondOrderPosition: String
   ): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
     val dateOffset = OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-    pool.preparedQuery("INSERT INTO trip (user_account_id, route_id, cost, description, people_limit, date_trip ) VALUES($1, $2, $3, $4, $5, $6)",
-      Tuple.of(userId, routeId, cost, description, peopleLimit, dateOffset)) { ar ->
+    //val promiseRoute: Promise<JsonObject> = Promise.promise<JsonObject>()
+    pool.preparedQuery("INSERT INTO route (name) VALUES($1)",
+    Tuple.of(routeName)) { ar ->
+      if (ar.succeeded()) {
+        promise.complete(JsonObject().put("name", routeName))
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+
+    pool.preparedQuery("INSERT INTO point (order_position, coordinates, route_id) " +
+      "VALUES(1, $1, (SELECT id_route FROM route r WHERE r.name = $2))",
+    Tuple.of(firstOrderPosition, routeName)) { ar ->
+      if (ar.succeeded()) {
+        promise.complete(JsonObject().put("coordinates", firstOrderPosition))
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+
+    pool.preparedQuery("INSERT INTO point (order_position, coordinates, route_id) " +
+      "VALUES(2, $1, (SELECT id_route FROM route r WHERE r.name = $2))",
+      Tuple.of(secondOrderPosition, routeName)) { ar ->
+      if (ar.succeeded()) {
+        promise.complete(JsonObject().put("coordinates", firstOrderPosition))
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+
+    pool.preparedQuery("INSERT INTO trip (user_account_id, route_id, cost, description, people_limit, date_trip, active ) "+
+      "VALUES($1, (SELECT id_route FROM route r WHERE r.name = $6) , $2, $3, $4, $5, $7)",
+      Tuple.of(userId, cost, description, peopleLimit, dateOffset, routeName, active)) { ar ->
       if (ar.succeeded()) {
         promise.complete(JsonObject().put("description", description))
       } else {
@@ -93,50 +120,68 @@ class TripRepository(private val pool: PgPool) {
 
   fun updateTrip(
     tripId: Int,
-    newRouteId: Int?,
     newCost: String?,
     newDescription: String?,
     newPeopleLimit: Int?,
     newDateTrip: OffsetDateTime?,
     active: Boolean?
-  ): Future<JsonObject> {
+    //newRouteName: String?,
+    //newFirstOrderPosition: String?,
+    //newSecondOrderPosition: String?
+  ):  Future<JsonObject> {
+//    patchTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTrip, active)
+//    patchRoute(newRouteName, routeId)
     val promise = Promise.promise<JsonObject>()
-    val counter = AtomicInteger(1)
+    var counter = AtomicInteger(1)
     val updates = listOf(
-      Pair("routeId", newRouteId),
       Pair("cost", newCost),
       Pair("description", newDescription),
       Pair("people_limit", newPeopleLimit),
       Pair("date_trip", newDateTrip),
       Pair("active", active)
+      //Pair("routeName", newRouteName),
+      //Pair("firstCoordinates", newFirstOrderPosition),
+      //Pair("secondCoordinates", newSecondOrderPosition)
     ).filter { it.second != null }
-    updates.forEach { println(it.first) }
     val setExpr = updates.joinToString(", ") { "${it.first} = $${counter.getAndIncrement()}" }
-    println(setExpr)
     val updateValues = updates
       .map { it.second }
-    var oneUser = ""
-    val tuple = Tuple.wrap(updateValues).addInteger(tripId)
+      .toMutableList()
+      .apply { add(tripId) }
+      .toTypedArray()
     pool.preparedQuery(
-      "WITH rows AS(" +
-        "UPDATE trip SET $setExpr FROM user_account WHERE id_trip = $${counter.getAndIncrement()} $oneUser" +
-        " RETURNING 1)" +
-        "SELECT COUNT(*) FROM rows",
-      tuple) { ar ->
+      "UPDATE trip SET $setExpr WHERE id_trip = $${counter.getAndIncrement()}",
+      Tuple.wrap(*updateValues)
+    ) { ar ->
       if (ar.succeeded()) {
-        val counter = ar.result().first().getValue(0)
-        if (counter.toString() == "0") {
-          promise.fail(NoSuchResourceException("No trip with id $tripId or you don't have rights to modify it."))
-        } else {
-          promise.complete(JsonObject()
-            .put("routeId", newRouteId)
-            .put("cost", newCost)
-            .put("description", newDescription)
-            .put("people_limit", newPeopleLimit)
-            .put("date_trip", newDateTrip)
-            .put("active", active)
-          )
-        }
+        promise.complete()
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
+  fun updateRoute(newRouteName: String,tripId: Int): Future<JsonObject> {
+    val promise = Promise.promise<JsonObject>()
+    pool.preparedQuery("UPDATE route SET name = $1 WHERE route.id_route = (SELECT route_id from trip WHERE id_trip = $2)",
+      Tuple.of(newRouteName, tripId)) { ar ->
+      if (ar.succeeded()) {
+        promise.complete(JsonObject().put("name", newRouteName))
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
+  fun updateCoordinate(newFirstOrderPosition: String, tripId: Int, pointNumber: Int): Future<JsonObject> {
+    val promise = Promise.promise<JsonObject>()
+    pool.preparedQuery("UPDATE point SET coordinates = $1 " +
+      "WHERE point.route_id = (SELECT route_id FROM trip WHERE id_trip = $2) AND order_position =$3",
+      Tuple.of(newFirstOrderPosition, tripId, pointNumber)) { ar ->
+      if (ar.succeeded()) {
+        promise.complete(JsonObject().put("coordinates", newFirstOrderPosition))
       } else {
         promise.fail(ar.cause())
       }

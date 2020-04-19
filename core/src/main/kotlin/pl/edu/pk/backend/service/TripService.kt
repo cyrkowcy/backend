@@ -28,13 +28,16 @@ class TripService(
   }
 
   fun createTrip(cost: String,
-                 routeId: Int,
                  description: String,
                  peopleLimit: Int,
                  date: String,
+                 active: Boolean,
+                 routeName: String,
+                 firstOrderPosition: String,
+                 secondOrderPosition: String,
                  email: String
   ): Future<JsonObject> {
-    if (cost.isBlank() or description.isBlank()) {
+    if (cost.isBlank() or description.isBlank() or routeName.isBlank() or firstOrderPosition.isBlank() or secondOrderPosition.isBlank() or active == null) {
       return Future.failedFuture(ValidationException("Lack of inforamtions"))
     }
     if ((peopleLimit < 1)) {
@@ -50,29 +53,61 @@ class TripService(
         tripRepository.insertTrip(
           user.id,
           cost,
-          routeId,
           description,
           peopleLimit,
-          date
+          date,
+          active,
+          routeName,
+          firstOrderPosition,
+          secondOrderPosition
         )
       }
   }
 
   fun patchTrip(
     tripId: Int,
-    routeId: Int?,
     newCost: String?,
     newDescription: String?,
     newPeopleLimit: Int?,
     newDateTrip: String?,
-    active: Boolean?
+    active: Boolean?,
+    newRouteName: String?,
+    newFirstOrderPosition: String?,
+    newSecondOrderPosition: String?
   ): Future<JsonObject> {
     var newDateTripOffset: OffsetDateTime? = null
     if (newDateTrip != null) {
       newDateTripOffset = OffsetDateTime.parse(newDateTrip)
       if (newDateTripOffset.isBefore(OffsetDateTime.now()))
-        return Future.failedFuture(ValidationException("Wrong Information."))
+        return Future.failedFuture(ValidationException("Wrong date."))
     }
-    return tripRepository.updateTrip(tripId, routeId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
+
+    if((newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null || active != null)
+      && (newRouteName != null || newRouteName != null || newFirstOrderPosition != null || newSecondOrderPosition != null)) {
+      if (newRouteName != null){
+        tripRepository.updateRoute(newRouteName, tripId)
+      }
+      if(newFirstOrderPosition != null) {
+        tripRepository.updateCoordinate(newFirstOrderPosition, tripId, 1)
+      }
+      if(newSecondOrderPosition != null){
+         tripRepository.updateCoordinate(newSecondOrderPosition, tripId,2)
+      }
+      return tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
+    }
+
+    if(newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null || active != null) {
+      return tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
+    }
+    if(newRouteName != null) {
+      return tripRepository.updateRoute(newRouteName, tripId)
+    }
+    if(newFirstOrderPosition != null){
+      return tripRepository.updateCoordinate(newFirstOrderPosition, tripId,1)
+    }
+    if(newSecondOrderPosition != null){
+      return tripRepository.updateCoordinate(newSecondOrderPosition, tripId,2)
+    }
+    return Future.future()
   }
 }

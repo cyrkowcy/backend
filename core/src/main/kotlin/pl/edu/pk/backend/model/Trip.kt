@@ -17,9 +17,11 @@ data class Trip (
 
 data class TripDto (
   val idTrip: Int,
-  val author: String,
-  val dateTrip: String,
+  val routeId: Int,
+  val cost: String,
+  val guide: String,
   val description: String,
+  val dateTrip: String,
   val active: Boolean
 ) {
   companion object {
@@ -27,6 +29,8 @@ data class TripDto (
       val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
       return TripDto(
         trip.idTrip,
+        trip.routeId,
+        trip.cost,
         trip.userAccountId.email,
         trip.description,
         trip.dateTrip.format(formatter),
