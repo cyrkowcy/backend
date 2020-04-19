@@ -1,10 +1,7 @@
 package pl.edu.pk.backend
 
 import io.vertx.pgclient.PgPool
-import pl.edu.pk.backend.repository.RoleUserRepository
-import pl.edu.pk.backend.repository.TicketCommentRepository
-import pl.edu.pk.backend.repository.TicketRepository
-import pl.edu.pk.backend.repository.UserRepository
+import pl.edu.pk.backend.repository.*
 
 class Repositories(private val pool: PgPool) {
   val roleUserRepository by lazy {
@@ -18,5 +15,9 @@ class Repositories(private val pool: PgPool) {
   }
   val ticketCommentRepository by lazy {
     TicketCommentRepository(pool)
+  }
+
+  val tripRepository by lazy {
+    TripRepository(pool)
   }
 }
