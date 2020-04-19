@@ -12,7 +12,8 @@ data class Trip(
   val description: String,
   val peopleLimit: Int,
   val dateTrip: OffsetDateTime,
-  val active: Boolean
+  val active: Boolean,
+  val comments: List<TripComment>
 )
 
 data class TripDto(
@@ -35,6 +36,20 @@ data class TripDto(
         trip.description,
         trip.dateTrip.format(formatter),
         trip.active
+      )
+    }
+  }
+}
+
+data class TripWithComment(
+  val ticket: TripDto,
+  val comments: List<TripCommentDto>
+) {
+  companion object {
+    fun from(trip: Trip): TripWithComment {
+      return TripWithComment(
+        TripDto.from(trip),
+        trip.comments.map { TripCommentDto.from(it) }
       )
     }
   }
