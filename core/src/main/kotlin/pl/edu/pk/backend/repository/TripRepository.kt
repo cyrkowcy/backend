@@ -194,7 +194,8 @@ class TripRepository(private val pool: PgPool) {
         row.getString("description"),
         row.getInteger("people_limit"),
         row.getOffsetDateTime("date_trip"),
-        row.getBoolean("active")
+        row.getBoolean("active"),
+        emptyList()
       )
     }
   }

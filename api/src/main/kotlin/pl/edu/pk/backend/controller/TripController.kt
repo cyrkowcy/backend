@@ -10,9 +10,7 @@ class TripController(private val tripService: TripService) {
     if (!ctx.checkCurrentUserHasRole(Role.Guide)) {
       return
     }
-    if (ctx.checkCurrentUserHasRole(Role.Guide)) {
-      ctx.handleResult(tripService.getTrips(ctx.getCurrentUserEmail()))
-    }
+    ctx.handleResult(tripService.getTrips(ctx.getCurrentUserEmail()))
   }
 
   fun getTrip(ctx: RoutingContext) {
@@ -20,9 +18,7 @@ class TripController(private val tripService: TripService) {
       return
     }
     val tripId = ctx.pathParam("tripId")
-    if (ctx.checkCurrentUserHasRole(Role.Guide)) {
-      ctx.handleResult(tripService.getTrip(ctx.getCurrentUserEmail(), tripId.toInt()))
-    }
+    ctx.handleResult(tripService.getTrip(ctx.getCurrentUserEmail(), tripId.toInt()))
   }
 
   fun postTrip(ctx: RoutingContext) {
@@ -75,7 +71,6 @@ class TripController(private val tripService: TripService) {
       ctx.failValidation(ApiError.Body, "At least one parameter is required for trip patch")
       return
     }
-    if (ctx.checkIfCurrentUserHasRole(Role.Guide)) {
       ctx.handleResult(tripService.patchTrip(
         tripId.toInt(),
         newCost,
@@ -87,6 +82,30 @@ class TripController(private val tripService: TripService) {
         newFirstOrderPosition,
         newSecondOrderPosition
       ))
+  }
+
+  fun createTripComment(ctx: RoutingContext) {
+    val tripId = ctx.pathParam("tripId")
+    val body = ctx.safeBodyAsJson() ?: return
+    val content = body.getString("content", "")
+    ctx.handleResult(tripService.createComment(tripId.toInt(), content, ctx.getCurrentUserEmail()))
+  }
+
+  fun getTripComments(ctx: RoutingContext) {
+    val tripId = ctx.pathParam("tripId")
+    ctx.handleResult(tripService.getComments(tripId.toInt()))
+  }
+
+  fun patchTripComment(ctx: RoutingContext) {
+    val tripId = ctx.pathParam("tripId")
+    val commentId = ctx.pathParam("commentId")
+    val body = ctx.safeBodyAsJson() ?: return
+    val content: String? = body.getString("content")
+    val deleted: Boolean? = body.getBoolean("deleted")
+    if (listOf(content, deleted).all {it == null}) {
+      ctx.failValidation(ApiError.Body, "At least one parameter is required for trip comment patch")
+      return
     }
+    ctx.handleResult(tripService.patchComment(tripId.toInt(), commentId.toInt(), content, deleted, ctx.getCurrentUserEmail()))
   }
 }
