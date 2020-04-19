@@ -9,6 +9,7 @@ import pl.edu.pk.backend.model.User
 class InitDatabase(val services: Services) {
 
   fun initDatabase() {
+    if (Config.profile != "local") return
     services.userService.getUsers().onSuccess {
       if (it.isEmpty()) {
         addUsers().compose {
@@ -42,6 +43,15 @@ class InitDatabase(val services: Services) {
       }.compose {
         services.ticketService.createComment(1, "Hi Anna. Nice first ticket!",
           "tomek@tomek.pl", true)
+      }.compose {
+        services.ticketService.createTicket("anna@anna.pl", "I can't add guide :(")
+          .compose {
+            services.ticketService.createComment(3,
+              "Mee too :(", "tomek@tomek.pl", true)
+              .compose {
+                services.ticketService.patchTicket(3, null, true, null)
+              }
+          }
       }
   }
 }
