@@ -2,7 +2,7 @@ package pl.edu.pk.backend.app
 
 object Config {
   val appSecret = env("APP_SECRET")
-  val profile = env("PROFILE")
+  val stage = env("STAGE")
   val database = Database()
 
   class Database {
