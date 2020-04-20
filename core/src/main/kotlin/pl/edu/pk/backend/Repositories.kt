@@ -16,8 +16,10 @@ class Repositories(private val pool: PgPool) {
   val ticketCommentRepository by lazy {
     TicketCommentRepository(pool)
   }
-
   val tripRepository by lazy {
     TripRepository(pool)
+  }
+  val tripCommentRepository by lazy {
+    TripCommentRepository(pool)
   }
 }

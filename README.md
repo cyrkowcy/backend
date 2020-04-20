@@ -11,12 +11,13 @@ Open [Swagger](http://149.156.146.249:60001/api/swagger/index.html)
 git config core.autocrlf false
 ```
 3. Open the project in Intellij IDEA
-4. Install PostgresSQL
-5. Create empty database in PostgresSQL
+4. Disable wildcard imports in Intellij IDEA settings. See [ktlint](https://github.com/pinterest/ktlint#option-3) documentation. 
+5. Install PostgresSQL
+6. Create empty database in PostgresSQL
 ```sql
 create database tourtool;
 ```
-6. Perform initial database migrations
+7. Perform initial database migrations
 ```
 export DATABASE_HOST=127.0.0.1:5432
 export DATABASE_NAME=tourtool
@@ -46,6 +47,11 @@ export APP_SECRET=123456
 ./gradlew run
 ```
 or run the main class from IDE, don't forget to setup environment variables.
+
+Before committing run:
+```
+./gradlew clean ktlintCheck test --info
+```
 
 Run tests:
 ```

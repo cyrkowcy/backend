@@ -37,7 +37,7 @@ class TripRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
-  
+
   fun getTripByEmail(
     email: String,
     ticketId: Int
@@ -64,6 +64,34 @@ class TripRepository(private val pool: PgPool) {
     return promise.future()
   }
 
+  private fun insertRoute(routeName: String): Future<Int> {
+    val promise = Promise.promise<Int>()
+    pool.preparedQuery("INSERT INTO route (name) VALUES($1) RETURNING id_route",
+      Tuple.of(routeName)) { ar ->
+      if (ar.succeeded()) {
+        println(ar.result().first().getInteger("id_route"))
+        promise.complete()
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
+  fun insertCoordinates(order: Int, coordinates: String, routeId: Future<Int>): Future<JsonObject>? {
+    val promise = Promise.promise<JsonObject>()
+    pool.preparedQuery("INSERT INTO point (order_position, coordinates, route_id) " +
+      "VALUES($1, $2, $3)",
+      Tuple.of(order, coordinates, routeId)) { ar ->
+      if (ar.succeeded()) {
+        promise.complete()
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
   fun insertTrip(
     userId: Int,
     cost: String,
@@ -72,43 +100,19 @@ class TripRepository(private val pool: PgPool) {
     date: String,
     active: Boolean,
     routeName: String,
+    order1: Int,
+    order2: Int,
     firstOrderPosition: String,
     secondOrderPosition: String
   ): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
     val dateOffset = OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-    pool.preparedQuery("INSERT INTO route (name) VALUES($1)",
-      Tuple.of(routeName)) { ar ->
-      if (ar.succeeded()) {
-        promise.complete(JsonObject().put("name", routeName))
-      } else {
-        promise.fail(ar.cause())
-      }
-    }
-
-    pool.preparedQuery("INSERT INTO point (order_position, coordinates, route_id) " +
-      "VALUES(1, $1, (SELECT id_route FROM route r WHERE r.name = $2))",
-      Tuple.of(firstOrderPosition, routeName)) { ar ->
-      if (ar.succeeded()) {
-        promise.complete(JsonObject().put("coordinates", firstOrderPosition))
-      } else {
-        promise.fail(ar.cause())
-      }
-    }
-
-    pool.preparedQuery("INSERT INTO point (order_position, coordinates, route_id) " +
-      "VALUES(2, $1, (SELECT id_route FROM route r WHERE r.name = $2))",
-      Tuple.of(secondOrderPosition, routeName)) { ar ->
-      if (ar.succeeded()) {
-        promise.complete(JsonObject().put("coordinates", firstOrderPosition))
-      } else {
-        promise.fail(ar.cause())
-      }
-    }
-
+    val routeId: Future<Int> = insertRoute(routeName)
+    insertCoordinates(order1, firstOrderPosition, routeId)
+    insertCoordinates(order2, secondOrderPosition, routeId)
     pool.preparedQuery("INSERT INTO trip (user_account_id, route_id, cost, description, people_limit, date_trip, active ) " +
-      "VALUES($1, (SELECT id_route FROM route r WHERE r.name = $6) , $2, $3, $4, $5, $7)",
-      Tuple.of(userId, cost, description, peopleLimit, dateOffset, routeName, active)) { ar ->
+      "VALUES($1, $6, $2, $3, $4, $5, $7)",
+      Tuple.of(userId, cost, description, peopleLimit, dateOffset, routeId, active)) { ar ->
       if (ar.succeeded()) {
         promise.complete(JsonObject().put("description", description))
       } else {
@@ -134,9 +138,6 @@ class TripRepository(private val pool: PgPool) {
       Pair("people_limit", newPeopleLimit),
       Pair("date_trip", newDateTrip),
       Pair("active", active)
-      //Pair("routeName", newRouteName),
-      //Pair("firstCoordinates", newFirstOrderPosition),
-      //Pair("secondCoordinates", newSecondOrderPosition)
     ).filter { it.second != null }
     val setExpr = updates.joinToString(", ") { "${it.first} = $${counter.getAndIncrement()}" }
     val updateValues = updates
@@ -194,7 +195,8 @@ class TripRepository(private val pool: PgPool) {
         row.getString("description"),
         row.getInteger("people_limit"),
         row.getOffsetDateTime("date_trip"),
-        row.getBoolean("active")
+        row.getBoolean("active"),
+        emptyList()
       )
     }
   }

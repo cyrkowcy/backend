@@ -10,6 +10,8 @@ tags:
     description: API status
   - name: ticket
     description: Ticket managment
+  - name: trip
+    description: Trip managment
 paths:
   /status:
     get:
@@ -110,7 +112,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
               $ref: "#/components/schemas/User"
         required: true
       responses:
-        "200":
+        "204":
           description: OK
         "400":
           description: Bad request
@@ -339,7 +341,91 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                     $ref: "#/components/schemas/NewTrip"
             "400":
               description: Bad request
-
+  /trip/{tripId}/comments:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - trip
+      summary: Get all comments for specific trip
+      description: "Get all comments for trip with given id"
+      operationId: getTripComments
+      parameters:
+        - name: tripId
+          in: path
+          description: trip id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comments'
+        "400":
+          description: Bad request
+  /trip/{tripId}/comment:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - trip
+      summary: Create new trip comment
+      description: "Create new comment for specific trip"
+      operationId: createTripComment
+      parameters:
+        - name: tripId
+          in: path
+          description: trip id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewComment'
+        required: true
+      responses:
+        "204":
+          description: OK
+        "400":
+          description: Bad request
+  /trip/{tripId}/comment/{commentId}:
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - trip
+      summary: Update trip comment
+      description: "Update comment for specific trip"
+      operationId: patchTripComment
+      parameters:
+        - name: tripId
+          in: path
+          description: trip id
+          required: true
+          schema:
+            type: integer
+        - name: commentId
+          in: path
+          description: comment id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchComment'
+        required: true
+      responses:
+        "204":
+          description: OK
+        "400":
+          description: Bad request
 servers:
   - url: http://149.156.146.249:60001/api
 components:
@@ -453,6 +539,12 @@ components:
       properties:
         status:
           type: string
-
+    PatchComment:
+      type: object
+      properties:
+        conent:
+          type: string
+        deleted:
+          type: boolean
 
 
