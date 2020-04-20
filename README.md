@@ -48,9 +48,9 @@ export APP_SECRET=123456
 ```
 or run the main class from IDE, don't forget to setup environment variables.
 
-Before committing run:
+Before committing make sure that linter checks and tests passes:
 ```
-./gradlew clean ktlintCheck test --info
+./gradlew clean ktlintCheck test
 ```
 
 Run tests:
