@@ -3,7 +3,6 @@ package pl.edu.pk.backend.model
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
-
 data class Trip(
   val idTrip: Int,
   val userAccountId: SensitiveUser,

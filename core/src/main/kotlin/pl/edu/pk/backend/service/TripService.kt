@@ -14,7 +14,6 @@ import pl.edu.pk.backend.util.ValidationException
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
-
 class TripService(
   private val tripRepository: TripRepository,
   private val userRepository: UserRepository,
@@ -26,7 +25,7 @@ class TripService(
 
   fun getTrip(email: String, tripId: Int): Future<TripWithComment> {
     return tripRepository.getTripByEmail(email, tripId)
-      .compose {enrichTripWithComment(it)}
+      .compose { enrichTripWithComment(it) }
   }
 
   fun getTrips(email: String): Future<List<TripDto>> {
@@ -40,19 +39,21 @@ class TripService(
       .map { TripWithComment.from(it) }
   }
 
-  fun createTrip(cost: String,
-                 description: String,
-                 peopleLimit: Int,
-                 date: String,
-                 active: Boolean,
-                 routeName: String,
-                 order1: Int,
-                 order2: Int,
-                 firstOrderPosition: String,
-                 secondOrderPosition: String,
-                 email: String
+  fun createTrip(
+    cost: String,
+    description: String,
+    peopleLimit: Int,
+    date: String,
+    active: Boolean,
+    routeName: String,
+    order1: Int,
+    order2: Int,
+    firstOrderPosition: String,
+    secondOrderPosition: String,
+    email: String
   ): Future<JsonObject> {
-    if (cost.isBlank() or description.isBlank() or routeName.isBlank() or firstOrderPosition.isBlank() or secondOrderPosition.isBlank() or active == null) {
+    if (cost.isBlank() or description.isBlank() or routeName.isBlank() or firstOrderPosition.isBlank()
+      or secondOrderPosition.isBlank() or active == null) {
       return Future.failedFuture(ValidationException("Lack of inforamtions"))
     }
     if ((peopleLimit < 1)) {
@@ -65,7 +66,7 @@ class TripService(
     }
     return userRepository.getUserByEmail(email)
       .compose { user ->
-        tripRepository.insertTrip(
+        tripRepository.insertAll(
           user.id,
           cost,
           description,
@@ -99,8 +100,10 @@ class TripService(
         return Future.failedFuture(ValidationException("Wrong date."))
     }
 
-    if ((newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null || active != null)
-      && (newRouteName != null || newRouteName != null || newFirstOrderPosition != null || newSecondOrderPosition != null)) {
+    if ((newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null ||
+        active != null) &&
+      (newRouteName != null || newRouteName != null || newFirstOrderPosition != null ||
+        newSecondOrderPosition != null)) {
       if (newRouteName != null) {
         tripRepository.updateRoute(newRouteName, tripId)
       }
@@ -113,7 +116,8 @@ class TripService(
       return tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
     }
 
-    if (newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null || active != null) {
+    if (newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null ||
+      active != null) {
       return tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
     }
     if (newRouteName != null) {
@@ -146,7 +150,13 @@ class TripService(
       }
   }
 
-  fun patchComment(tripId: Int, commentId: Int, content: String?, deleted: Boolean?, email: String): Future<JsonObject> {
+  fun patchComment(
+    tripId: Int,
+    commentId: Int,
+    content: String?,
+    deleted: Boolean?,
+    email: String
+  ): Future<JsonObject> {
     return tripRepository.getTripByEmail(email, tripId)
       .compose { trip ->
         if (trip.userAccountId.email != email) {

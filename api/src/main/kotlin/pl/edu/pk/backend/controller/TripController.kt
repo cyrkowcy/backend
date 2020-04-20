@@ -1,6 +1,5 @@
 package pl.edu.pk.backend.controller
 
-import io.vertx.core.json.Json
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
@@ -38,7 +37,7 @@ class TripController(private val tripService: TripService) {
     val routeName: String = route.getString("name", "")
     val points: JsonArray = route.getJsonArray("points")
     val order1 = (points.getJsonObject(0).getInteger("order"))
-    val firstOrderPosition =(points.getJsonObject(0).getString("coordinates"))
+    val firstOrderPosition = (points.getJsonObject(0).getString("coordinates"))
     val order2 = (points.getJsonObject(1).getInteger("order"))
     val secondOrderPosition = (points.getJsonObject(1).getString("coordinates"))
 
@@ -51,6 +50,8 @@ class TripController(private val tripService: TripService) {
       dateTrip,
       active,
       routeName,
+      order1,
+      order2,
       firstOrderPosition,
       secondOrderPosition,
       ctx.getCurrentUserEmail()))
@@ -62,7 +63,7 @@ class TripController(private val tripService: TripService) {
     }
     val tripId = ctx.pathParam("tripId")
     val body = ctx.safeBodyAsJson() ?: return
-    val newCost: String? = body.getString("cost")
+    val newICost: Int? = body.getInteger("cost")
     val newDescription: String? = body.getString("description")
     val newPeopleLimit: Int? = body.getInteger("peopleLimit")
     val newDateTrip: String? = body.getString("DateTrip")
@@ -71,9 +72,12 @@ class TripController(private val tripService: TripService) {
     val newRouteName: String = route.getString("name", "")
     val points: JsonArray = route.getJsonArray("points")
     val order1 = (points.getJsonObject(0).getInteger("order"))
-    val newFirstOrderPosition =(points.getJsonObject(0).getString("coordinates"))
+    val newFirstOrderPosition = (points.getJsonObject(0).getString("coordinates"))
     val order2 = (points.getJsonObject(1).getInteger("order"))
     val newSecondOrderPosition = (points.getJsonObject(1).getString("coordinates"))
+
+    val newCost: String? = newICost.toString()
+
     if (listOf(newCost,
         newDescription,
         newRouteName,
@@ -86,17 +90,17 @@ class TripController(private val tripService: TripService) {
       ctx.failValidation(ApiError.Body, "At least one parameter is required for trip patch")
       return
     }
-      ctx.handleResult(tripService.patchTrip(
-        tripId.toInt(),
-        newCost,
-        newDescription,
-        newPeopleLimit,
-        newDateTrip,
-        active,
-        newRouteName,
-        newFirstOrderPosition,
-        newSecondOrderPosition
-      ))
+    ctx.handleResult(tripService.patchTrip(
+      tripId.toInt(),
+      newCost,
+      newDescription,
+      newPeopleLimit,
+      newDateTrip,
+      active,
+      newRouteName,
+      newFirstOrderPosition,
+      newSecondOrderPosition
+    ))
   }
 
   fun createTripComment(ctx: RoutingContext) {
@@ -117,10 +121,11 @@ class TripController(private val tripService: TripService) {
     val body = ctx.safeBodyAsJson() ?: return
     val content: String? = body.getString("content")
     val deleted: Boolean? = body.getBoolean("deleted")
-    if (listOf(content, deleted).all {it == null}) {
+    if (listOf(content, deleted).all { it == null }) {
       ctx.failValidation(ApiError.Body, "At least one parameter is required for trip comment patch")
       return
     }
-    ctx.handleResult(tripService.patchComment(tripId.toInt(), commentId.toInt(), content, deleted, ctx.getCurrentUserEmail()))
+    ctx.handleResult(tripService.patchComment(tripId.toInt(), commentId.toInt(), content, deleted,
+      ctx.getCurrentUserEmail()))
   }
 }
