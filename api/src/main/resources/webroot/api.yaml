@@ -7,9 +7,9 @@ tags:
   - name: user
     description: User management
   - name: status
-    description: API status
+    description: API status and managment
   - name: ticket
-    description: Ticket managment
+    description: Support Ticket managment
   - name: trip
     description: Trip managment
 paths:
@@ -272,7 +272,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
       security:
         - bearerAuth: []
       tags:
-        - trips
+        - trip
       summary: Get current user all trips
       description: Shows all trips created by user.
       operationId: getTrips
@@ -295,52 +295,63 @@ Non-admin user can only patch themselves. Admin can patch anyone."
       description: Shows only one trip with provided tripId created by user.
       operationId: getTrip
       parameters:
-          - name: ticketId
-            in: path
-            description: ticket id
-            required: true
-            schema:
-              type: integer
+        - name: tripId
+          in: path
+          description: trip id
+          required: true
+          schema:
+            type: integer
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/trip'
+                $ref: '#/components/schemas/Trip'
         "400":
           description: Bad request
     patch:
+      security:
+        - bearerAuth: []
       tags:
         - trip
-        summary: patches trip
-        description: "patches trip that was created by user provided by user(guide)"
-        operationId: update
-        - responses:
-          "200":
-            description: OK
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/PatchTrip"
-          "400":
-            description: Bad request
+      summary: patches trip
+      description: "patches trip that was created by user provided by user(guide)"
+      operationId: update
+      parameters:
+        - name: tripId
+          in: path
+          description: trip id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PatchTrip"
+        "400":
+          description: Bad request
   /trip:
     post:
+      security:
+        - bearerAuth: []
       tags:
         - trip
-        summary: create new trip
-        description: "create new trip with informations provided by user(guide)"
-        operationId: createTrip
-        - responses:
-            "200":
-              description: OK
-              content:
-                application/json:
-                  schema:
-                    $ref: "#/components/schemas/NewTrip"
-            "400":
-              description: Bad request
+      summary: create new trip
+      description: "create new trip with informations provided by user(guide)"
+      operationId: createTrip
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NewTrip"
+        "400":
+          description: Bad request
   /trip/{tripId}/comments:
     get:
       security:
@@ -546,5 +557,3 @@ components:
           type: string
         deleted:
           type: boolean
-
-
