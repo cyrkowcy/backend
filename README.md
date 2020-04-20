@@ -63,3 +63,8 @@ Build fat jar:
 ```
 ./gradlew shadowJar
 ```
+
+Swagger:  
+When updating endpoints you will have to update API definition
+located under `api/src/main/resources/webroot/api.yaml`.  
+Use [Swagger Editor](https://editor.swagger.io/) for preview and validation.
