@@ -44,6 +44,7 @@ export DATABASE_NAME=tourtool
 export DATABASE_USER=postgres
 export DATABASE_PASSWORD=123456
 export APP_SECRET=123456
+export STAGE=LOCAL
 ./gradlew run
 ```
 or run the main class from IDE, don't forget to setup environment variables.

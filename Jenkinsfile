@@ -132,5 +132,7 @@ pipeline {
     DATABASE_USER = 'backend'
     DATABASE_PASSWORD = credentials('database-password')
     APP_SECRET = credentials('app-secret')
-  }
+    For stage env: STAGE=sta
+    For prod env: STAGE=pro
+    }
 }
