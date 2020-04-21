@@ -12,7 +12,7 @@ private val logger = LogManager.getLogger("Init database")
 class InitDatabase(val services: Services) {
 
   fun initDatabase() {
-    if (Config.stage != "local") {
+    if (Config.stage == "PRO") {
       return
     }
     services.userService.getUsers().onSuccess {
