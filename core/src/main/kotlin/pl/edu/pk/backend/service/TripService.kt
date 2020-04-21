@@ -148,7 +148,6 @@ class TripService(
         } else {
           Future.failedFuture(AuthorizationException("You don't have permission " +
             "to update comment: $commentId"))
-
         }
       }
   }
