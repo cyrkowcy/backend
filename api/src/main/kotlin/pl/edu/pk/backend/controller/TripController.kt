@@ -126,6 +126,7 @@ class TripController(private val tripService: TripService) {
       return
     }
     ctx.handleResult(tripService.patchComment(tripId.toInt(), commentId.toInt(), content, deleted,
-      ctx.getCurrentUserEmail()))
+      ctx.getCurrentUserEmail(),
+      ctx.checkIfCurrentUserHasRole(Role.Admin)))
   }
 }

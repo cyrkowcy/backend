@@ -553,7 +553,7 @@ components:
     PatchComment:
       type: object
       properties:
-        conent:
+        content:
           type: string
         deleted:
           type: boolean
