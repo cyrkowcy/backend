@@ -48,9 +48,9 @@ export APP_SECRET=123456
 ```
 or run the main class from IDE, don't forget to setup environment variables.
 
-Before committing run:
+Before committing make sure that linter checks and tests passes:
 ```
-./gradlew clean ktlintCheck test --info
+./gradlew clean ktlintCheck test
 ```
 
 Run tests:
@@ -63,3 +63,8 @@ Build fat jar:
 ```
 ./gradlew shadowJar
 ```
+
+Swagger:  
+When updating endpoints you will have to update API definition
+located under `api/src/main/resources/webroot/api.yaml`.  
+Use [Swagger Editor](https://editor.swagger.io/) for preview and validation.

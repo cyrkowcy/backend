@@ -6,21 +6,45 @@ import io.vertx.core.json.JsonObject
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.Tuple
+import pl.edu.pk.backend.model.SensitiveUser
 import pl.edu.pk.backend.model.TripComment
+import pl.edu.pk.backend.util.NoSuchResourceException
 import java.util.concurrent.atomic.AtomicInteger
 
 class TripCommentRepository(private val pool: PgPool) {
-  fun getComments(tripId: Int): Future<List<TripComment>> {
+  fun getComments(tripId: Int, includeRemoved: Boolean): Future<List<TripComment>> {
     val promise = Promise.promise<List<TripComment>>()
     pool.preparedQuery(
       """SELECT * FROM trip_comment c
-         LEFT JOIN user_account u ON c.id_comment_user_account = u.id_user_account
-         WHERE trip_id = $1""".trimMargin(),
-      Tuple.of(tripId)
+         LEFT JOIN user_account u ON c.user_account_id = u.id_user_account
+         WHERE trip_id = $1 AND deleted = $2""".trimMargin(),
+      Tuple.of(tripId, includeRemoved)
     ) { ar ->
       if (ar.succeeded()) {
         val comments = ar.result()
         promise.complete(comments.map(::mapComment))
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
+  fun getCommentAuthor(commentId: Int, tripId: Int): Future<SensitiveUser> {
+    val promise = Promise.promise<SensitiveUser>()
+    pool.preparedQuery(
+      """SELECT * FROM user_account c
+         JOIN trip_comment t ON t.user_account_id = c.id_user_account
+         WHERE t.id_comment_user_account = $1 AND t.trip_id = $2""".trimMargin(),
+      Tuple.of(commentId, tripId)
+    ) { ar ->
+      if (ar.succeeded()) {
+        val rows = ar.result()
+        if (rows.size() == 0) {
+          promise.fail(NoSuchResourceException("No such trip comment with id: $commentId"))
+        } else {
+          promise.complete(mapCommentAuthor(rows.first()))
+        }
       } else {
         promise.fail(ar.cause())
       }
@@ -75,5 +99,17 @@ private fun mapComment(row: Row): TripComment {
     UserRepository.mapUser(row),
     row.getString("content"),
     row.getBoolean("deleted")
+  )
+}
+
+private fun mapCommentAuthor(row: Row): SensitiveUser {
+  return SensitiveUser(
+    row.getInteger("id_user_account"),
+    row.getString("first_name"),
+    row.getString("last_name"),
+    row.getString("email"),
+    row.getString("password"),
+    row.getBoolean("disabled"),
+    emptyList()
   )
 }
