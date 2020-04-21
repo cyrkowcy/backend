@@ -2,10 +2,8 @@ package pl.edu.pk.backend.service
 
 import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
-import pl.edu.pk.backend.model.Trip
 import pl.edu.pk.backend.model.TripCommentDto
 import pl.edu.pk.backend.model.TripDto
-import pl.edu.pk.backend.model.TripWithComment
 import pl.edu.pk.backend.repository.TripCommentRepository
 import pl.edu.pk.backend.repository.TripRepository
 import pl.edu.pk.backend.repository.UserRepository
@@ -23,20 +21,13 @@ class TripService(
     return tripRepository.getAllTrips().map { it.map { TripDto.from(it) } }
   }
 
-  fun getTrip(email: String, tripId: Int): Future<TripWithComment> {
-    return tripRepository.getTripByEmail(email, tripId)
-      .compose { enrichTripWithComment(it) }
+  fun getTrip(email: String, tripId: Int): Future<TripDto> {
+    return tripRepository.getTripByEmail(email, tripId).map { TripDto.from(it) }
   }
 
   fun getTrips(email: String): Future<List<TripDto>> {
     return tripRepository.getTripsByGuideEmail(email)
       .map { it.map { TripDto.from(it) } }
-  }
-
-  private fun enrichTripWithComment(trip: Trip): Future<TripWithComment> {
-    return tripCommentRepository.getComments(trip.idTrip)
-      .map { trip.copy(comments = it) }
-      .map { TripWithComment.from(it) }
   }
 
   fun createTrip(
@@ -138,16 +129,8 @@ class TripService(
     } else if (content.length > 1000) {
       return Future.failedFuture(ValidationException("Content is too long. Max content size 1000"))
     }
-    return tripRepository.getTripByEmail(email, tripId)
-      .compose { trip ->
-        if (trip.userAccountId.email != email) {
-          Future.failedFuture(AuthorizationException("You don't have permission " +
-            "to create comment into trip: $tripId"))
-        } else {
-          userRepository.getUserByEmail(email)
-            .compose { tripCommentRepository.insertComment(tripId, content, it.id) }
-        }
-      }
+    return userRepository.getUserByEmail(email)
+      .compose { tripCommentRepository.insertComment(tripId, content, it.id) }
   }
 
   fun patchComment(
@@ -155,21 +138,22 @@ class TripService(
     commentId: Int,
     content: String?,
     deleted: Boolean?,
-    email: String
+    email: String,
+    isAdmin: Boolean
   ): Future<JsonObject> {
-    return tripRepository.getTripByEmail(email, tripId)
-      .compose { trip ->
-        if (trip.userAccountId.email != email) {
+    return tripCommentRepository.getCommentAuthor(commentId, tripId)
+      .compose { user ->
+        if (email == user.email || isAdmin) {
+          tripCommentRepository.updateComment(commentId, content, deleted)
+        } else {
           Future.failedFuture(AuthorizationException("You don't have permission " +
             "to update comment: $commentId"))
-        } else {
-          userRepository.getUserByEmail(email)
-            .compose { tripCommentRepository.updateComment(commentId, content, deleted) }
         }
       }
   }
 
   fun getComments(tripId: Int): Future<List<TripCommentDto>> {
-    return tripCommentRepository.getComments(tripId).map { it.map { TripCommentDto.from(it) } }
+    return tripCommentRepository.getComments(tripId, false)
+      .map { it.map { TripCommentDto.from(it) } }
   }
 }

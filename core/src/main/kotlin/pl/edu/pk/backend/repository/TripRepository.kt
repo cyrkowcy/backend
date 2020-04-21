@@ -40,11 +40,11 @@ class TripRepository(private val pool: PgPool) {
 
   fun getTripByEmail(
     email: String,
-    ticketId: Int
+    tripId: Int
   ): Future<Trip> {
     val query = "SELECT * FROM trip t " +
       "LEFT JOIN user_account u ON t.user_account_id = u.id_user_account WHERE t.id_trip = $1 and u.email = $2"
-    return getTrip(query, Tuple.of(ticketId, email))
+    return getTrip(query, Tuple.of(tripId, email))
   }
 
   private fun getTrip(query: String, tuple: Tuple): Future<Trip> {
