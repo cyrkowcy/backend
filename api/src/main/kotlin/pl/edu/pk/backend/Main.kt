@@ -9,7 +9,6 @@ import pl.edu.pk.backend.app.createDatabasePool
 import pl.edu.pk.backend.app.InitDatabase
 import pl.edu.pk.backend.app.createRouter
 
-
 private val logger = LogManager.getLogger("Main")
 
 fun main() {
