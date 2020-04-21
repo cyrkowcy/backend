@@ -50,8 +50,6 @@ class TripService(
     if ((peopleLimit < 1)) {
       return Future.failedFuture(ValidationException("People Limit can't be smaller than 1"))
     }
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-    println(date)
     if (OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME).isBefore(OffsetDateTime.now())) {
       return Future.failedFuture(ValidationException("Wrong date"))
     }
@@ -136,8 +134,8 @@ class TripService(
   fun patchComment(
     tripId: Int,
     commentId: Int,
-    content: String?,
-    deleted: Boolean?,
+    content: String? = null,
+    deleted: Boolean? = null,
     email: String,
     isAdmin: Boolean
   ): Future<JsonObject> {

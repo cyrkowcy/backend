@@ -80,7 +80,7 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET --name backendruntest --restart always --net netapp -it backendtest'
+        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET -e STAGE=STA --name backendruntest --restart always --net netapp -it backendtest'
       }
     }
 
@@ -121,7 +121,7 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET --name backendrun --restart always --net netapp -it backend'
+        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET -e STAGE=PRO --name backendrun --restart always --net netapp -it backend'
       }
     }
 

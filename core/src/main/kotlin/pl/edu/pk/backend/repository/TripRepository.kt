@@ -69,7 +69,6 @@ class TripRepository(private val pool: PgPool) {
     pool.preparedQuery("INSERT INTO route (name) VALUES($1) RETURNING id_route",
       Tuple.of(routeName)) { ar ->
       if (ar.succeeded()) {
-        println(ar.result().first().getInteger("id_route"))
         promise.complete(ar.result().first().getInteger("id_route"))
       } else {
         promise.fail(ar.cause())

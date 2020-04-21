@@ -120,12 +120,12 @@ class UserService(
 
   fun patchUser(
     email: String,
-    newFirstName: String?,
-    newLastName: String?,
-    newEmail: String?,
-    newPassword: String?,
-    newDisabled: Boolean?,
-    newRoles: List<Role>?
+    newFirstName: String? = null,
+    newLastName: String? = null,
+    newEmail: String? = null,
+    newPassword: String? = null,
+    newDisabled: Boolean? = null,
+    newRoles: List<Role>? = null
   ): Future<Nothing> {
     if ((newFirstName != null && newFirstName.isBlank()) ||
       (newLastName != null && newLastName.isBlank())

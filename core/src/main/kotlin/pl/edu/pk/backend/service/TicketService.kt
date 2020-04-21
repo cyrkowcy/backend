@@ -73,7 +73,12 @@ class TicketService(
       }
   }
 
-  fun patchTicket(ticketId: Int, content: String?, closed: Boolean?, email: String?): Future<JsonObject> {
+  fun patchTicket(
+    ticketId: Int,
+    content: String? = null,
+    closed: Boolean? = null,
+    email: String? = null
+  ): Future<JsonObject> {
     if (content != null && (content.isBlank() || content.length > 1000)) {
       return Future.failedFuture(ValidationException("Content too long or blank."))
     }
