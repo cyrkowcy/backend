@@ -439,6 +439,11 @@ Non-admin user can only patch themselves. Admin can patch anyone."
           description: Bad request
 servers:
   - url: http://149.156.146.249:60001/api
+    description: Production server
+  - url: http://149.156.146.249:60001/api-pre
+    description: Staging server
+  - url: http://127.0.0.1:8090
+    description: Local server
 components:
   securitySchemes:
     bearerAuth:

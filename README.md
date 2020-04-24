@@ -37,7 +37,7 @@ gradlew flywayMigrate
 
 ### Working with the project
 
-Start app:
+##### Start app
 ```
 export DATABASE_HOST=127.0.0.1:5432
 export DATABASE_NAME=tourtool
@@ -54,18 +54,33 @@ Before committing make sure that linter checks and tests passes:
 ./gradlew clean ktlintCheck test
 ```
 
-Run tests:
+##### Run tests
 ```
 ./gradlew test
 ```
 or run tests from IDE.
 
-Build fat jar:
+##### Build fat jar
 ```
 ./gradlew shadowJar
 ```
 
-Swagger:  
+##### Swagger  
 When updating endpoints you will have to update API definition
 located under `api/src/main/resources/webroot/api.yaml`.  
 Use [Swagger Editor](https://editor.swagger.io/) for preview and validation.
+
+##### Local Swagger
+
+To have working local Swagger UI you must run once:
+```json
+gradlew copySwaggerUi
+```
+This will copy Swagger files to `/api/src/main/resources/webroot/swagger` 
+(this directory is excluded from Git)
+
+Then after starting app you can access Swagger at
+```json
+http://127.0.0.1:8090/swagger/index.html
+```
+You will need to change yml path at the top to `/api.yaml`
