@@ -1,7 +1,20 @@
 # backend
 [![Build Status](http://149.156.146.249:60001/jenkins/job/backend/job/master/badge/icon?style=flat-square)](http://149.156.146.249:60001/jenkins/job/backend/job/master/)
 
-Open [Swagger](http://149.156.146.249:60001/api/swagger/index.html)
+Open [Swagger](http://149.156.146.249:60001/api-pre/swagger/index.html)
+
+### Environments
+
+Staging environment (PRE)
+```
+http://149.156.146.249:60001/api-pre
+```
+
+Production environment (PRO)
+```
+http://149.156.146.249:60001/api
+```
+
 
 ### Setup
 
