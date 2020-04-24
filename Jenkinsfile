@@ -69,14 +69,21 @@ pipeline {
       }
     }
     stage('Ask Promote') {
-      def userInput = input(
-        id: 'userInput', message: 'Promote this build?', parameters: [
-            [$class: 'BooleanParameterDefinition', defaultValue: false, description: '', name: 'Please confirm you are sure to proceed']
-        ]
-      )
-      if (!userInput) {
-          currentBuild.result = 'ABORTED'
-          error "Build wasn't promoted"
+      when {
+        anyOf {
+          branch 'master'
+        }
+      }
+      steps {
+        def userInput = input(
+          id: 'userInput', message: 'Promote this build?', parameters: [
+              [$class: 'BooleanParameterDefinition', defaultValue: false, description: '', name: 'Please confirm you are sure to proceed']
+          ]
+        )
+        if (!userInput) {
+            currentBuild.result = 'ABORTED'
+            error "Build wasn't promoted"
+        }
       }
     }
     stage('Docker prepare PRO') {
