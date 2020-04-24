@@ -68,7 +68,17 @@ pipeline {
         sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME=tourtool_pre -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET -e STAGE=STA --name backendruntest --restart always --net netapp -it backendtest'
       }
     }
-
+    stage('Ask Promote') {
+      def userInput = input(
+        id: 'userInput', message: 'Promote this build?', parameters: [
+            [$class: 'BooleanParameterDefinition', defaultValue: false, description: '', name: 'Please confirm you are sure to proceed']
+        ]
+      )
+      if (!userInput) {
+          currentBuild.result = 'ABORTED'
+          error "Build wasn't promoted"
+      }
+    }
     stage('Docker prepare PRO') {
       when {
         anyOf {
