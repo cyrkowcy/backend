@@ -14,6 +14,8 @@ dependencies {
   implementation "io.vertx:vertx-pg-client:$vertxVersion"
   implementation "io.vertx:vertx-auth-jwt:$vertxVersion"
   implementation "io.vertx:vertx-junit5:$vertxVersion"
+  implementation "org.postgresql:postgresql:$postgresqlVersion"
+  implementation "org.flywaydb:flyway-core:6.3.1"
   implementation "de.mkammerer:argon2-jvm:2.5"
   implementation "com.auth0:java-jwt:3.10.1"
   implementation "org.apache.logging.log4j:log4j-api:$log4jVersion"

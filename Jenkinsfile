@@ -28,22 +28,7 @@ pipeline {
       }
     }
 
-    stage('Migrate database') {
-      when {
-        anyOf {
-          branch 'master'
-        }
-
-      }
-      steps {
-        withGradle() {
-          sh './gradlew flywayMigrate'
-        }
-
-      }
-    }
-
-    stage('Docker prepare phase test') {
+    stage('Docker prepare PRE') {
       when {
         anyOf {
           branch 'master'
@@ -57,7 +42,7 @@ pipeline {
       }
     }
 
-    stage('Docker build phase test') {
+    stage('Docker build PRE') {
       when {
         anyOf {
           branch 'master'
@@ -72,7 +57,7 @@ pipeline {
       }
     }
 
-    stage('Docker run phase test') {
+    stage('Docker run PRE') {
       when {
         anyOf {
           branch 'master'
@@ -80,11 +65,11 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET -e STAGE=STA --name backendruntest --restart always --net netapp -it backendtest'
+        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME=tourtool-pre -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET -e STAGE=STA --name backendruntest --restart always --net netapp -it backendtest'
       }
     }
 
-    stage('Docker prepare ') {
+    stage('Docker prepare PRO') {
       when {
         anyOf {
           branch 'master'
@@ -98,7 +83,7 @@ pipeline {
       }
     }
 
-    stage('Docker build') {
+    stage('Docker build PRO') {
       when {
         anyOf {
           branch 'master'
@@ -113,7 +98,7 @@ pipeline {
       }
     }
 
-    stage('Docker run') {
+    stage('Docker run PRO') {
       when {
         anyOf {
           branch 'master'
@@ -121,14 +106,12 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET -e STAGE=PRO --name backendrun --restart always --net netapp -it backend'
+        sh 'docker run -d -p 8090:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME=tourtool -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET -e STAGE=PRO --name backendrun --restart always --net netapp -it backend'
       }
     }
 
   }
   environment {
-    DATABASE_HOST = '127.0.0.1:5432'
-    DATABASE_NAME = 'tourtool'
     DATABASE_USER = 'backend'
     DATABASE_PASSWORD = credentials('database-password')
     APP_SECRET = credentials('app-secret')

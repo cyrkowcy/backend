@@ -8,11 +8,13 @@ import pl.edu.pk.backend.app.Controllers
 import pl.edu.pk.backend.app.createDatabasePool
 import pl.edu.pk.backend.app.InitDatabase
 import pl.edu.pk.backend.app.createRouter
+import pl.edu.pk.backend.app.migrateDatabase
 
 private val logger = LogManager.getLogger("Main")
 
 fun main() {
   logger.info("App started")
+  migrateDatabase()
   val vertx = Vertx.vertx()
   vertx.exceptionHandler {
     logger.error("Uncaught exception", it)
