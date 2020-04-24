@@ -503,6 +503,8 @@ components:
           type: string
         create_data:
           type: string
+        content:
+          type: string
     NewTicket:
       type: object
       properties:
