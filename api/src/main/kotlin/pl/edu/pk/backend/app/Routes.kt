@@ -53,7 +53,12 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
   }
 
   router.route().handler(StaticHandler.create().setCachingEnabled(false))
-
+  router.route("/").handler { ctx ->
+    ctx.response()
+      .setStatusCode(302)
+      .putHeader("location", "/swagger/index.html")
+      .end()
+  }
   return router
 }
 
