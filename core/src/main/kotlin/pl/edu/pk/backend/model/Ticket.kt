@@ -8,7 +8,7 @@ data class Ticket(
   val author: SensitiveUser,
   val content: String,
   val closed: Boolean,
-  val createData: OffsetDateTime,
+  val createDate: OffsetDateTime,
   val comments: List<TicketComment>
 )
 
@@ -16,7 +16,8 @@ data class TicketDto(
   val id: Int,
   val closed: Boolean,
   val author: String,
-  val createData: String
+  val createDate: String,
+  val content: String
 ) {
   companion object {
     fun from(ticket: Ticket): TicketDto {
@@ -25,7 +26,9 @@ data class TicketDto(
         ticket.id,
         ticket.closed,
         ticket.author.email,
-        ticket.createData.format(formatter))
+        ticket.createDate.format(formatter),
+        ticket.content
+      )
     }
   }
 }

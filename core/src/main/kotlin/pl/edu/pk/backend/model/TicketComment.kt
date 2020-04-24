@@ -6,7 +6,7 @@ class TicketComment(
   val id: Int,
   val content: String,
   val user: SensitiveUser,
-  val createData: OffsetDateTime
+  val createDate: OffsetDateTime
 )
 
 class TicketCommentDto(
