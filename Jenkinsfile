@@ -65,7 +65,7 @@ pipeline {
 
       }
       steps {
-        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME=tourtool-pre -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET -e STAGE=STA --name backendruntest --restart always --net netapp -it backendtest'
+        sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME=tourtool_pre -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET -e STAGE=STA --name backendruntest --restart always --net netapp -it backendtest'
       }
     }
 
