@@ -8,6 +8,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import org.junit.jupiter.api.Test
 import pl.edu.pk.backend.model.Role
+import pl.edu.pk.backend.model.TicketDto
 import pl.edu.pk.backend.service.TicketService
 import pl.edu.pk.backend.util.ValidationException
 
@@ -19,7 +20,15 @@ class TicketControllerTest {
     val controller = TicketController(service)
     every { ctx.get<String>("currentUserEmail") } returns "test@example.com"
     every { service.createTicket(any(), any()) } returns
-      Future.succeededFuture(JsonObject())
+      Future.succeededFuture(
+        TicketDto(
+          1,
+          false,
+          "test@emaple.com",
+          "26.04.2020",
+          "Hello world"
+        )
+      )
     every { ctx.get<List<Role>>("currentUserRoles") } returns listOf(Role.User)
     every { ctx.bodyAsJson } returns JsonObject(
       mapOf(
