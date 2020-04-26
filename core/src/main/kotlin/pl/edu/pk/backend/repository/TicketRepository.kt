@@ -7,8 +7,10 @@ import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.Tuple
 import pl.edu.pk.backend.model.Ticket
+import pl.edu.pk.backend.model.TicketDto
 import pl.edu.pk.backend.util.NoSuchResourceException
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
 class TicketRepository(private val pool: PgPool) {
@@ -67,13 +69,22 @@ class TicketRepository(private val pool: PgPool) {
     return promise.future()
   }
 
-  fun insertTicket(userId: Int, content: String): Future<JsonObject> {
-    val promise = Promise.promise<JsonObject>()
+  fun insertTicket(userId: Int, content: String, email: String): Future<TicketDto> {
+    val promise = Promise.promise<TicketDto>()
     val createTime = OffsetDateTime.now()
-    pool.preparedQuery("INSERT INTO ticket (user_account_id, content, create_date) VALUES($1, $2, $3)",
+    pool.preparedQuery("INSERT INTO ticket (user_account_id, content, create_date)" +
+      " VALUES($1, $2, $3) RETURNING id_ticket",
       Tuple.of(userId, content, createTime)) { ar ->
       if (ar.succeeded()) {
-        promise.complete(JsonObject().put("content", content))
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        val ticketId = ar.result().first().getInteger("id_ticket")
+        promise.complete(TicketDto(
+          ticketId,
+          false,
+          email,
+          createTime.format(formatter),
+          content
+        ))
       } else {
         promise.fail(ar.cause())
       }

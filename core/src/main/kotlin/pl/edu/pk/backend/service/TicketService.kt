@@ -45,14 +45,14 @@ class TicketService(
       .map { it.map { TicketDto.from(it) } }
   }
 
-  fun createTicket(email: String, content: String): Future<JsonObject> {
+  fun createTicket(email: String, content: String): Future<TicketDto> {
     if (content.isBlank()) {
       return Future.failedFuture(ValidationException("Content is blank."))
     } else if (content.length > 1000) {
       return Future.failedFuture(ValidationException("Content is too long. Max content size 1000"))
     }
     return userRepository.getUserByEmail(email)
-      .compose { user -> ticketRepository.insertTicket(user.id, content) }
+      .compose { user -> ticketRepository.insertTicket(user.id, content, email) }
   }
 
   fun createComment(ticketId: Int, content: String, email: String, isAdmin: Boolean): Future<JsonObject> {
