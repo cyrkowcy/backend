@@ -72,7 +72,8 @@ class TicketRepository(private val pool: PgPool) {
   fun insertTicket(userId: Int, content: String, email: String): Future<TicketDto> {
     val promise = Promise.promise<TicketDto>()
     val createTime = OffsetDateTime.now()
-    pool.preparedQuery("INSERT INTO ticket (user_account_id, content, create_date) VALUES($1, $2, $3) RETURNING id_ticket",
+    pool.preparedQuery("INSERT INTO ticket (user_account_id, content, create_date)" +
+      " VALUES($1, $2, $3) RETURNING id_ticket",
       Tuple.of(userId, content, createTime)) { ar ->
       if (ar.succeeded()) {
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
