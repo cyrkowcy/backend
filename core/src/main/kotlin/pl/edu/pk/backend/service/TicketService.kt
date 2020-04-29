@@ -1,19 +1,17 @@
 package pl.edu.pk.backend.service
 
+import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
-import pl.edu.pk.backend.model.Ticket
-import pl.edu.pk.backend.model.TicketDto
-import pl.edu.pk.backend.model.TicketWithComment
+import pl.edu.pk.backend.model.*
 import pl.edu.pk.backend.repository.TicketCommentRepository
 import pl.edu.pk.backend.repository.TicketRepository
-import pl.edu.pk.backend.repository.UserRepository
 import pl.edu.pk.backend.util.AuthorizationException
 import pl.edu.pk.backend.util.ValidationException
 
 class TicketService(
   private val ticketRepository: TicketRepository,
-  private val userRepository: UserRepository,
+  private val userService: UserService,
   private val ticketCommentRepository: TicketCommentRepository
 ) {
 
@@ -24,20 +22,32 @@ class TicketService(
 
   fun getTicket(id: Int): Future<TicketWithComment> {
     return ticketRepository.getTicket(id)
-      .compose { enrichTicketWithComment(it) }
+      .compose { enrichTicketWithComments(it) }
   }
 
   fun getTicketWrittenBy(email: String, ticketId: Int): Future<TicketWithComment> {
     return ticketRepository.getTicketByEmail(email, ticketId)
       .compose {
-        enrichTicketWithComment(it)
+        enrichTicketWithComments(it)
       }
   }
 
-  private fun enrichTicketWithComment(ticket: Ticket): Future<TicketWithComment> {
+  private fun enrichTicketWithComments(ticket: Ticket): Future<TicketWithComment> {
     return ticketCommentRepository.getComments(ticket.id)
+      .compose { enrichCommentsAuthorsWithRoles(it) }
       .map { ticket.copy(comments = it) }
       .map { TicketWithComment.from(it) }
+  }
+
+  private fun enrichCommentsAuthorsWithRoles(comments: List<TicketComment>): Future<List<TicketComment>> {
+    return CompositeFuture.all(comments
+      .map { comment ->
+        userService.getRoles(comment.user.email).map { roles ->
+          comment.copy(user = comment.user.copy(roles = roles))
+        }
+      }).map {
+      it.list<TicketComment>()
+    }
   }
 
   fun getTicketsWrittenBy(email: String): Future<List<TicketDto>> {
@@ -51,11 +61,11 @@ class TicketService(
     } else if (content.length > 1000) {
       return Future.failedFuture(ValidationException("Content is too long. Max content size 1000"))
     }
-    return userRepository.getUserByEmail(email)
+    return userService.getSensitiveUserByEmail(email)
       .compose { user -> ticketRepository.insertTicket(user.id, content, email) }
   }
 
-  fun createComment(ticketId: Int, content: String, email: String, isAdmin: Boolean): Future<JsonObject> {
+  fun createComment(ticketId: Int, content: String, email: String, isAdmin: Boolean): Future<TicketCommentDto> {
     if (content.isBlank()) {
       return Future.failedFuture(ValidationException("Content is blank."))
     } else if (content.length > 1000) {
@@ -67,8 +77,8 @@ class TicketService(
           Future.failedFuture(AuthorizationException("You don't have permission " +
             "to create comment into ticket: $ticketId"))
         } else {
-          userRepository.getUserByEmail(email)
-            .compose { ticketCommentRepository.insertComment(ticketId, content, it.id) }
+          userService.getSensitiveUserByEmail(email)
+            .compose { user -> ticketCommentRepository.insertComment(ticketId, content, user) }
         }
       }
   }

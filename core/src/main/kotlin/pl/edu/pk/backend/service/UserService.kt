@@ -35,14 +35,18 @@ class UserService(
   }
 
   fun getUserByEmail(email: String): Future<User> {
+    return getSensitiveUserByEmail(email)
+      .map { it.toUser() }
+  }
+
+  fun getSensitiveUserByEmail(email: String): Future<SensitiveUser> {
     return userRepository.getUserByEmail(email)
       .compose { enrichWithUserRoles(it) }
   }
 
-  private fun enrichWithUserRoles(user: SensitiveUser): Future<User> {
+  private fun enrichWithUserRoles(user: SensitiveUser): Future<SensitiveUser> {
     return roleUserRepository.getRoles(user.email)
       .map { user.copy(roles = it) }
-      .map { it.toUser() }
   }
 
   fun loginUser(email: String, password: String): Future<Login> {

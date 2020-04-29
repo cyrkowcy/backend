@@ -2,22 +2,22 @@ package pl.edu.pk.backend.model
 
 import java.time.OffsetDateTime
 
-class TicketComment(
+data class TicketComment(
   val id: Int,
   val content: String,
   val user: SensitiveUser,
   val createDate: OffsetDateTime
 )
 
-class TicketCommentDto(
+data class TicketCommentDto(
   val content: String,
-  val author: String
+  val author: User
 ) {
   companion object {
     fun from(ticketComment: TicketComment): TicketCommentDto {
       return TicketCommentDto(
         ticketComment.content,
-        ticketComment.user.email
+        ticketComment.user.toUser()
       )
     }
   }

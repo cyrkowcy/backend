@@ -2,11 +2,12 @@ package pl.edu.pk.backend.repository
 
 import io.vertx.core.Future
 import io.vertx.core.Promise
-import io.vertx.core.json.JsonObject
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.Tuple
+import pl.edu.pk.backend.model.SensitiveUser
 import pl.edu.pk.backend.model.TicketComment
+import pl.edu.pk.backend.model.TicketCommentDto
 import java.time.OffsetDateTime
 
 class TicketCommentRepository(private val pool: PgPool) {
@@ -28,14 +29,13 @@ class TicketCommentRepository(private val pool: PgPool) {
     return promise.future()
   }
 
-  fun insertComment(ticketId: Int, content: String, userId: Int): Future<JsonObject> {
-    val promise = Promise.promise<JsonObject>()
+  fun insertComment(ticketId: Int, content: String, sensitiveUser: SensitiveUser): Future<TicketCommentDto> {
+    val promise = Promise.promise<TicketCommentDto>()
     val createTime = OffsetDateTime.now()
     pool.preparedQuery("""INSERT INTO ticket_comment (content, user_account_id, ticket_id, create_date)
-      Values($1, $2, $3, $4)""".trimMargin(), Tuple.of(content, userId, ticketId, createTime)) { ar ->
+      Values($1, $2, $3, $4)""".trimMargin(), Tuple.of(content, sensitiveUser.id, ticketId, createTime)) { ar ->
       if (ar.succeeded()) {
-        promise.complete(JsonObject()
-          .put("content", content))
+        promise.complete(TicketCommentDto(content, sensitiveUser.toUser()))
       } else {
         promise.fail(ar.cause())
       }
