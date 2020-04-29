@@ -3,7 +3,11 @@ package pl.edu.pk.backend.service
 import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
-import pl.edu.pk.backend.model.*
+import pl.edu.pk.backend.model.Ticket
+import pl.edu.pk.backend.model.TicketCommentDto
+import pl.edu.pk.backend.model.TicketComment
+import pl.edu.pk.backend.model.TicketDto
+import pl.edu.pk.backend.model.TicketWithComment
 import pl.edu.pk.backend.repository.TicketCommentRepository
 import pl.edu.pk.backend.repository.TicketRepository
 import pl.edu.pk.backend.util.AuthorizationException
