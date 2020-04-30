@@ -264,7 +264,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NewComment'
+                $ref: '#/components/schemas/CommentWithAuthor'
         "400":
           description: Bad request
   /trips:
@@ -538,6 +538,17 @@ components:
           type: string
         author:
           type: string
+    CommentsWithAuthors:
+      type: array
+      items:
+        $ref: '#/components/schemas/CommentWithAuthor'
+    CommentWithAuthor:
+      type: object
+      properties:
+        content:
+          type: string
+        author:
+          $ref: '#/components/schemas/User'
     NewComment:
       type: object
       properties:
@@ -551,7 +562,7 @@ components:
         ticket:
           $ref: '#/components/schemas/Ticket'
         comments:
-          $ref: '#/components/schemas/Comments'
+          $ref: '#/components/schemas/CommentsWithAuthors'
     ApiStatus:
       type: object
       properties:

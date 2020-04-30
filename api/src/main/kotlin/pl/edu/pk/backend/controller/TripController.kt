@@ -71,9 +71,7 @@ class TripController(private val tripService: TripService) {
     val route: JsonObject = body.getJsonObject("route")
     val newRouteName: String = route.getString("name", "")
     val points: JsonArray = route.getJsonArray("points")
-    val order1 = (points.getJsonObject(0).getInteger("order"))
     val newFirstOrderPosition = (points.getJsonObject(0).getString("coordinates"))
-    val order2 = (points.getJsonObject(1).getInteger("order"))
     val newSecondOrderPosition = (points.getJsonObject(1).getString("coordinates"))
 
     val newCost: String? = newICost.toString()
