@@ -423,7 +423,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
       tags:
         - trip
       summary: Update trip comment
-      description: "Update comment for specific trip"
+      description: "Update comment for specific trip. At least one field is required. User can only edit their own comments."
       operationId: patchTripComment
       parameters:
         - name: tripId
