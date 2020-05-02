@@ -11,14 +11,14 @@ tags:
   - name: ticket
     description: Support Ticket managment
   - name: trip
-    description: Trip managment
+    description: Trip authoring and managment
 paths:
   /status:
     get:
       tags:
         - status
       summary: Get API status
-      description: ""
+      description: Get current API status
       operationId: getStatus
       responses:
         "200":
@@ -32,7 +32,7 @@ paths:
       tags:
         - user
       summary: Login as user
-      description: ""
+      description: Get JWT token by providing user email and password
       operationId: loginUser
       requestBody:
         content:
@@ -54,7 +54,7 @@ paths:
       tags:
         - user
       summary: Create new user
-      description: ""
+      description: Create new user with specified details.
       operationId: createUser
       requestBody:
         content:
@@ -77,7 +77,7 @@ paths:
       tags:
         - user
       summary: Get current user
-      description: ""
+      description: Get details of currently logged in user
       operationId: getCurrentUser
       responses:
         "200":
@@ -112,7 +112,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
               $ref: "#/components/schemas/User"
         required: true
       responses:
-        "204":
+        "200":
           description: OK
         "400":
           description: Bad request
@@ -123,7 +123,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
       tags:
         - user
       summary: Get all users
-      description: ""
+      description: Get list of every user. This can be only done by the administrator.
       operationId: getUsers
       responses:
         "200":
@@ -273,8 +273,8 @@ Non-admin user can only patch themselves. Admin can patch anyone."
         - bearerAuth: []
       tags:
         - trip
-      summary: Get current user all trips
-      description: Shows all trips created by user.
+      summary: Get current user added trips
+      description: Shows all trips created by current guide user.
       operationId: getTrips
       responses:
         "200":
@@ -282,7 +282,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Trips"
+                $ref: '#/components/schemas/Trips'
         "400":
           description: Bad request
   /trip/{tripId}:
@@ -315,7 +315,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
         - bearerAuth: []
       tags:
         - trip
-      summary: patches trip
+      summary: Update trip
       description: "patches trip that was created by user provided by user(guide)"
       operationId: update
       parameters:
@@ -325,13 +325,19 @@ Non-admin user can only patch themselves. Admin can patch anyone."
           required: true
           schema:
             type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trip'
+        required: true
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PatchTrip"
+                $ref: "#/components/schemas/Trip"
         "400":
           description: Bad request
   /trip:
@@ -340,16 +346,22 @@ Non-admin user can only patch themselves. Admin can patch anyone."
         - bearerAuth: []
       tags:
         - trip
-      summary: create new trip
-      description: "create new trip with informations provided by user(guide)"
+      summary: Create new trip
+      description: "Create new trip with informations provided by the user (must be a guide)"
       operationId: createTrip
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trip'
+        required: true
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/NewTrip"
+                $ref: "#/components/schemas/Trip"
         "400":
           description: Bad request
   /trip/{tripId}/comments:
@@ -400,7 +412,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
               $ref: '#/components/schemas/NewComment'
         required: true
       responses:
-        "204":
+        "200":
           description: OK
         "400":
           description: Bad request
@@ -433,7 +445,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
               $ref: '#/components/schemas/PatchComment'
         required: true
       responses:
-        "204":
+        "200":
           description: OK
         "400":
           description: Bad request
@@ -506,7 +518,7 @@ components:
           type: boolean
         author:
           type: string
-        create_date:
+        createDate:
           type: string
         content:
           type: string
@@ -569,6 +581,63 @@ components:
         status:
           type: string
     PatchComment:
+      type: object
+      properties:
+        content:
+          type: string
+        deleted:
+          type: boolean
+    TripPoint:
+      type: object
+      properties:
+        order:
+          type: integer
+        coordinates:
+          type: string
+    TripRoute:
+      type: object
+      properties:
+        name:
+          type: string
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripPoint'
+    Trip:
+      type: object
+      properties:
+        id:
+          type: integer
+        cost:
+          type: integer
+        description:
+          type: string
+        peopleLimit:
+          type: integer
+        dateTrip:
+          type: string
+        active:
+          type: boolean
+        guide:
+          $ref: '#/components/schemas/User'
+        route:
+          $ref: '#/components/schemas/TripRoute'
+    Trips:
+      type: array
+      items:
+        $ref: '#/components/schemas/Trip'
+    TripComment:
+      type: object
+      properties:
+        author:
+          type: string
+        comment:
+          type: string
+    TripComments:
+      type: array
+      items:
+        $ref: '#/components/schemas/TripComment'
+    PatchTripComment:
       type: object
       properties:
         content:
