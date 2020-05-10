@@ -162,4 +162,10 @@ class UserService(
       }
       .compose { Future.succeededFuture<Nothing>() }
   }
+  fun patchImage(
+    email: String,
+    newImage: String?
+  ): Future<Nothing> {
+    return userRepository.updateImage(email, newImage)
+  }
 }

@@ -91,6 +91,24 @@ class UserRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
+  fun updateImage(
+    targetEmail: String,
+    targetImage: String?
+  ): Future<Nothing> {
+    val promise = Promise.promise<Nothing>()
+    val counter = AtomicInteger(1)
+    pool.preparedQuery(
+      "UPDATE user_account SET image = $1 WHERE email = $2",
+      Tuple.of(targetImage, targetEmail)
+    ) { ar ->
+      if (ar.succeeded()) {
+        promise.complete()
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
 
   companion object {
     fun mapUser(row: Row): SensitiveUser {
@@ -101,7 +119,8 @@ class UserRepository(private val pool: PgPool) {
         row.getString("email"),
         row.getString("password"),
         row.getBoolean("disabled"),
-        emptyList()
+        emptyList(),
+        row.getString("image")
       )
     }
   }

@@ -15,7 +15,8 @@ data class SensitiveUser(
   val email: String,
   val password: String,
   val disabled: Boolean,
-  val roles: List<Role>
+  val roles: List<Role>,
+  val image: String
 ) {
   fun toUser(): User {
     return User(firstName, lastName, email, disabled, roles)

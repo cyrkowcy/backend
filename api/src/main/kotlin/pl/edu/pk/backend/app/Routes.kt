@@ -32,6 +32,7 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
     router.post("/user").handler(::postUser)
     router.post("/login").handler(::postLogin)
     router.patch("/user/:email").handler(::patchUser)
+    router.patch("/user/:image").handler(::patchImage)
   }
 
   with(controllers.ticketController) {

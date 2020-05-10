@@ -110,6 +110,7 @@ private fun mapCommentAuthor(row: Row): SensitiveUser {
     row.getString("email"),
     row.getString("password"),
     row.getBoolean("disabled"),
-    emptyList()
+    emptyList(),
+    row.getString("password")
   )
 }
