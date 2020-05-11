@@ -92,7 +92,7 @@ class UserController(private val userService: UserService) {
   }
 
   fun getAvailableTripsForUser(ctx: RoutingContext) {
-    val description = ctx.queryParam("description").firstOrNull()?: ""
+    val description = ctx.queryParam("description").firstOrNull() ?: ""
     ctx.handleResult(userService.getAvailableTrips(description))
   }
 
