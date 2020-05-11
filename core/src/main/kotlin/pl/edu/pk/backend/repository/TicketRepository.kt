@@ -115,8 +115,8 @@ class TicketRepository(private val pool: PgPool) {
         "SELECT COUNT(*) FROM rows",
       tuple) { ar ->
       if (ar.succeeded()) {
-        val counter = ar.result().first().getValue(0)
-        if (counter.toString() == "0") {
+        val localCounter = ar.result().first().getValue(0)
+        if (localCounter.toString() == "0") {
           promise.fail(NoSuchResourceException("No ticket with id $ticketId or you don't have rights to modify it."))
         } else {
           promise.complete(JsonObject()

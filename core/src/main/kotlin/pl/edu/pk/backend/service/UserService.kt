@@ -5,12 +5,15 @@ import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.core.Promise
 import io.vertx.core.Vertx
+import io.vertx.core.json.JsonObject
 import org.apache.commons.validator.routines.EmailValidator
 import pl.edu.pk.backend.model.Login
 import pl.edu.pk.backend.model.Role
 import pl.edu.pk.backend.model.SensitiveUser
 import pl.edu.pk.backend.model.User
+import pl.edu.pk.backend.model.TripDto
 import pl.edu.pk.backend.repository.RoleUserRepository
+import pl.edu.pk.backend.repository.TripRepository
 import pl.edu.pk.backend.repository.UserRepository
 import pl.edu.pk.backend.util.AuthorizationException
 import pl.edu.pk.backend.util.ResourceAlreadyExists
@@ -20,6 +23,7 @@ class UserService(
   private val vertx: Vertx,
   private val userRepository: UserRepository,
   private val roleUserRepository: RoleUserRepository,
+  private val tripRepository: TripRepository,
   private val jwtService: JwtService
 ) {
   private val passwordRegex = "^.{6,}$".toRegex()
@@ -161,5 +165,23 @@ class UserService(
         CompositeFuture.all(newRoles.map { role -> roleUserRepository.addRole(finalEmail, role) })
       }
       .compose { Future.succeededFuture<Nothing>() }
+  }
+
+  fun getUserTrips(email: String): Future<List<TripDto>> {
+    return tripRepository.getUserTrips(email)
+      .map { it.map { TripDto.from(it) } }
+  }
+
+  fun getAvailableTrips(description: String): Future<List<TripDto>> {
+    return tripRepository.getAvailableTrips(description)
+      .map { it.map { TripDto.from(it) } }
+  }
+
+  fun joinTrip(email: String, tripId: Int): Future<JsonObject> {
+    return tripRepository.insertUserTrip(email, tripId)
+  }
+
+  fun deleteUserTrip(email: String, tripId: Int): Future<JsonObject> {
+    return tripRepository.deleteUserTrip(email, tripId)
   }
 }

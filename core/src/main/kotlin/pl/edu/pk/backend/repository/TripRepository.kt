@@ -19,9 +19,17 @@ class TripRepository(private val pool: PgPool) {
     return getTrips(query, Tuple.tuple())
   }
 
-  fun getTripsByGuideEmail(email: String): Future<List<Trip>> {
+  fun getTripsByEmail(email: String): Future<List<Trip>> {
     val query = "SELECT * FROM trip t LEFT JOIN user_account u ON t.user_account_id = u.id_user_account " +
       "WHERE u.email = $1"
+    return getTrips(query, Tuple.of(email))
+  }
+
+  fun getUserTrips(email: String): Future<List<Trip>> {
+    val query = "SELECT * FROM trip t " +
+      "LEFT JOIN user_account u ON t.user_account_id = u.id_user_account " +
+      "WHERE id_trip IN (SELECT trip_id FROM trip_user_account tu " +
+      "WHERE tu.user_account_id = (SELECT id_user_account FROM user_account WHERE email = $1))"
     return getTrips(query, Tuple.of(email))
   }
 
@@ -179,6 +187,40 @@ class TripRepository(private val pool: PgPool) {
       Tuple.of(newRouteName, tripId)) { ar ->
       if (ar.succeeded()) {
         promise.complete(JsonObject().put("name", newRouteName))
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
+  fun insertUserTrip(email: String, tripId: Int): Future<JsonObject> {
+    val promise = Promise.promise<JsonObject>()
+    pool.preparedQuery("""INSERT INTO trip_user_account (trip_id, user_account_id)
+      VALUES($1, (SELECT id_user_account FROM user_account u WHERE u.email = $2))""".trimMargin(),
+      Tuple.of(tripId, email)) { ar ->
+      if (ar.succeeded()) {
+        promise.complete()
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
+  fun getAvailableTrips(description: String): Future<List<Trip>> {
+    val query = "SELECT * FROM trip t LEFT JOIN user_account u ON t.user_account_id = u.id_user_account " +
+      "WHERE t.active = true AND t.description LIKE $1"
+    return getTrips(query, Tuple.of("%$description%"))
+  }
+
+  fun deleteUserTrip(email: String, tripId: Int): Future<JsonObject> {
+    val promise = Promise.promise<JsonObject>()
+    pool.preparedQuery("DELETE FROM trip_user_account t WHERE t.trip_id = $1 " +
+      "AND t.user_account_id = (SELECT id_user_account FROM user_account u WHERE u.email = $2) ",
+      Tuple.of(tripId, email)) { ar ->
+      if (ar.succeeded()) {
+        promise.complete()
       } else {
         promise.fail(ar.cause())
       }
