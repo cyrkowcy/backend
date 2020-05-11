@@ -26,7 +26,7 @@ class TripService(
   }
 
   fun getTrips(email: String): Future<List<TripDto>> {
-    return tripRepository.getTripsByGuideEmail(email)
+    return tripRepository.getTripsByEmail(email)
       .map { it.map { TripDto.from(it) } }
   }
 

@@ -32,6 +32,10 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
     router.post("/user").handler(::postUser)
     router.post("/login").handler(::postLogin)
     router.patch("/user/:email").handler(::patchUser)
+    router.get("/user/trips").handler(::getUserTrips)
+    router.post("/user/trips/:tripId").handler(::postUserTrip)
+    router.get("/user/trips/active").handler(::getAvailableTripsForUser)
+    router.delete("/user/trips/:tripId").handler(::deleteUserTrip)
   }
 
   with(controllers.ticketController) {

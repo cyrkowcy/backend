@@ -134,6 +134,74 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: "#/components/schemas/Users"
         "400":
           description: Bad request
+  /user/trips:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - user
+      summary: Get user history trips
+      description: Get list of all trips the user has participated in
+      operationId: getUserTrips
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Trips"
+        "400":
+          description: Bad request
+  /user/trip/{tripId}:
+    post:
+      security:
+        - bearerAuth: []
+        tags:
+          - user
+        summary: Join trip
+        description: Join trip by tripId
+        operationId: postUserTrip
+        responses:
+          "200":
+            description: OK
+          "400":
+            description: Bad request
+    delete:
+      security:
+        - bearerAuth: []
+        tags:
+          - user
+        summary: Remove user trip
+        description: Remove user trip by tripId
+        operationId: deleteUserTrip
+        responses:
+          "200":
+            description: OK
+          "400":
+            description: Bad request
+  /user/trips/active:
+    get:
+      security:
+        - bearerAuth: []
+        tags:
+          - user
+        summary: Get available trips for user
+        description: Get list of available trips searching by description
+        operationId: getAvailableTripsForUser
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Description"
+        responses:
+          "200":
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/Trips"
+          "400":
+            description: Bad request
   /ticket:
     get:
       security:
@@ -644,3 +712,5 @@ components:
           type: string
         deleted:
           type: boolean
+    Description:
+      type: string
