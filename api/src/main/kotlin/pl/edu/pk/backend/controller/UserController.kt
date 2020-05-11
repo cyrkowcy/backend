@@ -92,8 +92,7 @@ class UserController(private val userService: UserService) {
   }
 
   fun getAvailableTripsForUser(ctx: RoutingContext) {
-    val body = ctx.safeBodyAsJson() ?: return
-    val description = body.getString("description", "")
+    val description = ctx.queryParam("description").firstOrNull().toString()
     ctx.handleResult(userService.getAvailableTrips(description))
   }
 

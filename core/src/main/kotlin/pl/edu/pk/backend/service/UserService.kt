@@ -173,7 +173,7 @@ class UserService(
   }
 
   fun getAvailableTrips(description: String): Future<List<TripDto>> {
-    return tripRepository.getAvailableTrips(description)
+    return tripRepository.getAvailableTrips(if (description == "null") "" else description)
       .map { it.map { TripDto.from(it) } }
   }
 

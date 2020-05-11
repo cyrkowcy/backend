@@ -140,7 +140,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
         - bearerAuth: []
       tags:
         - user
-      summary: Get user history trips
+      summary: Get user trips history
       description: Get list of all trips the user has participated in
       operationId: getUserTrips
       responses:
@@ -152,56 +152,72 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: "#/components/schemas/Trips"
         "400":
           description: Bad request
-  /user/trip/{tripId}:
+  /user/trips/{tripId}:
     post:
       security:
         - bearerAuth: []
-        tags:
-          - user
-        summary: Join trip
-        description: Join trip by tripId
-        operationId: postUserTrip
-        responses:
-          "200":
-            description: OK
-          "400":
-            description: Bad request
+      tags:
+        - user
+      summary: Join trip
+      description: Join trip by tripId
+      operationId: postUserTrip
+      parameters:
+        - name: tripId
+          in: path
+          description: Trip Id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
     delete:
       security:
         - bearerAuth: []
-        tags:
-          - user
-        summary: Remove user trip
-        description: Remove user trip by tripId
-        operationId: deleteUserTrip
-        responses:
-          "200":
-            description: OK
-          "400":
-            description: Bad request
+      tags:
+        - user
+      summary: Remove user trip
+      description: Remove user trip by tripId
+      operationId: deleteUserTrip
+      parameters:
+        - name: tripId
+          in: path
+          description: Trip Id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
   /user/trips/active:
     get:
       security:
         - bearerAuth: []
-        tags:
-          - user
-        summary: Get available trips for user
-        description: Get list of available trips searching by description
-        operationId: getAvailableTripsForUser
-        requestBody:
+      tags:
+        - user
+      summary: Get available trips for user
+      description: Get list of available trips searching by description
+      operationId: getAvailableTripsForUser
+      parameters:
+        - name: description
+          in: query
+          description: Trip description
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Description"
-        responses:
-          "200":
-            description: OK
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/Trips"
-          "400":
-            description: Bad request
+                $ref: "#/components/schemas/Trips"
+        "400":
+          description: Bad request
   /ticket:
     get:
       security:
@@ -712,5 +728,3 @@ components:
           type: string
         deleted:
           type: boolean
-    Description:
-      type: string
