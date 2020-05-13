@@ -14,7 +14,7 @@ class JwtService(secret: String) {
 
   fun sign(email: String): String = JWT.create()
     .withClaim("email", email)
-    .withExpiresAt(Date.from(ZonedDateTime.now().plusDays(7).toInstant()))
+    .withExpiresAt(Date.from(ZonedDateTime.now().plusDays(365).toInstant()))
     .sign(algorithm)
 
   fun verify(token: String): DecodedJWT? {
