@@ -6,6 +6,8 @@ info:
 tags:
   - name: user
     description: User management
+  - name: user-trips
+    description: User trips managment
   - name: status
     description: API status and managment
   - name: ticket
@@ -112,7 +114,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
               $ref: "#/components/schemas/User"
         required: true
       responses:
-        "200":
+        "204":
           description: OK
         "400":
           description: Bad request
@@ -139,7 +141,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
       security:
         - bearerAuth: []
       tags:
-        - user
+        - user-trips
       summary: Get user trips history
       description: Get list of all trips the user has participated in
       operationId: getUserTrips
@@ -157,7 +159,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
       security:
         - bearerAuth: []
       tags:
-        - user
+        - user-trips
       summary: Join trip
       description: Join trip by tripId
       operationId: postUserTrip
@@ -169,15 +171,17 @@ Non-admin user can only patch themselves. Admin can patch anyone."
           schema:
             type: integer
       responses:
-        "200":
+        "204":
           description: OK
         "400":
           description: Bad request
+        "404":
+          description: Trip not found
     delete:
       security:
         - bearerAuth: []
       tags:
-        - user
+        - user-trips
       summary: Remove user trip
       description: Remove user trip by tripId
       operationId: deleteUserTrip
@@ -189,16 +193,16 @@ Non-admin user can only patch themselves. Admin can patch anyone."
           schema:
             type: integer
       responses:
-        "200":
+        "204":
           description: OK
-        "400":
-          description: Bad request
+        "404":
+          description: Trip not found
   /user/trips/active:
     get:
       security:
         - bearerAuth: []
       tags:
-        - user
+        - user-trips
       summary: Get available trips for user
       description: Get list of available trips searching by description
       operationId: getAvailableTripsForUser
@@ -218,7 +222,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: "#/components/schemas/Trips"
         "400":
           description: Bad request
-  /ticket:
+  /tickets:
     get:
       security:
         - bearerAuth: []
@@ -265,7 +269,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: '#/components/schemas/Ticket'
         "400":
           description: Bad request
-  /ticket/{ticketId}:
+  /tickets/{ticketId}:
     get:
       security:
         - bearerAuth: []
@@ -288,8 +292,8 @@ Non-admin user can only patch themselves. Admin can patch anyone."
             application/json:
               schema:
                 $ref: '#/components/schemas/TicketWithComments'
-        "400":
-          description: "Bad request"
+        "404":
+          description: "Ticket not found"
     patch:
       security:
         - bearerAuth: []
@@ -321,7 +325,9 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: '#/components/schemas/PatchTicket'
         "400":
           description: Bad request
-  /ticket/{ticketId}/comment:
+        "404":
+          description: Ticket not found
+  /tickets/{ticketId}/comments:
     post:
       security:
         - bearerAuth: []
@@ -351,6 +357,8 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: '#/components/schemas/CommentWithAuthor'
         "400":
           description: Bad request
+        "404":
+          description: Not found
   /trips:
     get:
       security:
@@ -369,7 +377,30 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: '#/components/schemas/Trips'
         "400":
           description: Bad request
-  /trip/{tripId}:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - trip
+      summary: Create new trip
+      description: "Create new trip with informations provided by the user (must be a guide)"
+      operationId: createTrip
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trip'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Trip"
+        "400":
+          description: Bad request
+  /trips/{tripId}:
     get:
       security:
         - bearerAuth: []
@@ -394,6 +425,8 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: '#/components/schemas/Trip'
         "400":
           description: Bad request
+        "404":
+          description: Trip not found
     patch:
       security:
         - bearerAuth: []
@@ -424,31 +457,9 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: "#/components/schemas/Trip"
         "400":
           description: Bad request
-  /trip:
-    post:
-      security:
-        - bearerAuth: []
-      tags:
-        - trip
-      summary: Create new trip
-      description: "Create new trip with informations provided by the user (must be a guide)"
-      operationId: createTrip
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Trip'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Trip"
-        "400":
-          description: Bad request
-  /trip/{tripId}/comments:
+        "404":
+          description: Trip not found
+  /trips/{tripId}/comments:
     get:
       security:
         - bearerAuth: []
@@ -473,7 +484,8 @@ Non-admin user can only patch themselves. Admin can patch anyone."
                 $ref: '#/components/schemas/Comments'
         "400":
           description: Bad request
-  /trip/{tripId}/comment:
+        "404":
+          description: Trip not found
     post:
       security:
         - bearerAuth: []
@@ -496,11 +508,13 @@ Non-admin user can only patch themselves. Admin can patch anyone."
               $ref: '#/components/schemas/NewComment'
         required: true
       responses:
-        "200":
+        "204":
           description: OK
         "400":
           description: Bad request
-  /trip/{tripId}/comment/{commentId}:
+        "404":
+          description: Trip not found
+  /trips/{tripId}/comments/{commentId}:
     patch:
       security:
         - bearerAuth: []
@@ -529,10 +543,12 @@ Non-admin user can only patch themselves. Admin can patch anyone."
               $ref: '#/components/schemas/PatchComment'
         required: true
       responses:
-        "200":
+        "204":
           description: OK
         "400":
           description: Bad request
+        "404":
+          description: Not found
 servers:
   - url: http://149.156.146.249:60001/api
     description: Production server

@@ -151,7 +151,8 @@ class TripService(
   }
 
   fun getComments(tripId: Int): Future<List<TripCommentDto>> {
-    return tripCommentRepository.getComments(tripId, false)
+    return tripRepository.getTripByTripId(tripId)
+      .compose { tripCommentRepository.getComments(tripId, false) }
       .map { it.map { TripCommentDto.from(it) } }
   }
 }

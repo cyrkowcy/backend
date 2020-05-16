@@ -33,10 +33,16 @@ fun <T> RoutingContext.handleResult(future: Future<T>) {
     when (handler.succeeded()) {
       true -> {
         val result = handler.result()?.let { Json.encodePrettily(it) } ?: ""
-        response()
-          .setStatusCode(200)
-          .putHeader("content-type", contentType)
-          .end(result)
+        if (!result.isEmpty()) {
+          response()
+            .setStatusCode(200)
+            .putHeader("content-type", contentType)
+            .end(result)
+        } else {
+          response()
+            .setStatusCode(204)
+            .end(result)
+        }
       }
       else -> {
         val cause = handler.cause()
