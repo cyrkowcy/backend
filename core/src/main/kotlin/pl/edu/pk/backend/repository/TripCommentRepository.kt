@@ -3,6 +3,7 @@ package pl.edu.pk.backend.repository
 import io.vertx.core.Future
 import io.vertx.core.Promise
 import io.vertx.core.json.JsonObject
+import io.vertx.pgclient.PgException
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.Tuple
@@ -60,7 +61,11 @@ class TripCommentRepository(private val pool: PgPool) {
       if (ar.succeeded()) {
         promise.complete()
       } else {
-        promise.fail(ar.cause())
+        if (ar.cause() is PgException && (ar.cause() as PgException).code == "23503") {
+          promise.fail(NoSuchResourceException("No such trip with id: $tripId"))
+        } else {
+          promise.fail(ar.cause())
+        }
       }
     }
     return promise.future()

@@ -25,6 +25,12 @@ class TripRepository(private val pool: PgPool) {
     return getTrips(query, Tuple.of(email))
   }
 
+  fun getTripByTripId(tripId: Int): Future<Trip> {
+    val query = "SELECT * FROM trip t LEFT JOIN user_account u ON t.user_account_id = u.id_user_account " +
+      "WHERE t.id_trip = $1"
+    return getTrip(query, Tuple.of(tripId))
+  }
+
   fun getUserTrips(email: String): Future<List<Trip>> {
     val query = "SELECT * FROM trip t " +
       "LEFT JOIN user_account u ON t.user_account_id = u.id_user_account " +
@@ -212,6 +218,25 @@ class TripRepository(private val pool: PgPool) {
     val query = "SELECT * FROM trip t LEFT JOIN user_account u ON t.user_account_id = u.id_user_account " +
       "WHERE t.active = true AND t.description LIKE $1"
     return getTrips(query, Tuple.of("%$description%"))
+  }
+
+  fun getTripUserToDelete(email: String, tripId: Int): Future<JsonObject> {
+    val query = "SELECT * FROM trip_user_account t WHERE " +
+      "t.trip_id = $1 AND t.user_account_id = (SELECT id_user_account FROM user_account u WHERE u.email = $2)"
+    val promise = Promise.promise<JsonObject>()
+    pool.preparedQuery(query, Tuple.of(tripId, email)) { ar ->
+      if (ar.succeeded()) {
+        val rows = ar.result()
+        if (rows.size() == 0) {
+          promise.fail(NoSuchResourceException("No such trip with id: $tripId"))
+        } else {
+          promise.complete()
+        }
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
   }
 
   fun deleteUserTrip(email: String, tripId: Int): Future<JsonObject> {

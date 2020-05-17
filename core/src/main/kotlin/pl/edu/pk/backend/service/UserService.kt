@@ -178,10 +178,16 @@ class UserService(
   }
 
   fun joinTrip(email: String, tripId: Int): Future<JsonObject> {
-    return tripRepository.insertUserTrip(email, tripId)
+    return tripRepository.getTripByTripId(tripId)
+      .compose {
+          tripRepository.insertUserTrip(email, tripId)
+      }
   }
 
   fun deleteUserTrip(email: String, tripId: Int): Future<JsonObject> {
-    return tripRepository.deleteUserTrip(email, tripId)
+    return tripRepository.getTripUserToDelete(email, tripId)
+      .compose {
+          tripRepository.deleteUserTrip(email, tripId)
+      }
   }
 }
