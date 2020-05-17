@@ -61,7 +61,7 @@ class TripCommentRepository(private val pool: PgPool) {
       if (ar.succeeded()) {
         promise.complete()
       } else {
-        if ((ar.cause() as PgException).detail.contains("nie występuje")) {
+        if (ar.cause() is PgException && (ar.cause() as PgException).code == "23503") {
           promise.fail(NoSuchResourceException("No such trip with id: $tripId"))
         } else {
           promise.fail(ar.cause())
