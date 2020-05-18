@@ -5,7 +5,7 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 data class Trip(
-  val idTrip: Int,
+  val id: Int,
   val routeId: Int,
   val cost: String,
   val description: String,
@@ -13,16 +13,11 @@ data class Trip(
   val dateTrip: OffsetDateTime,
   val active: Boolean,
   val guide: SensitiveUser,
-  //val route: Route,
   val comments: List<TripComment>
-){
-  fun getRoute(): Int {
-    return routeId
-  }
-}
+)
 
 data class TripDto(
-  val idTrip: Int,
+  val id: Int,
   val cost: String,
   val description: String,
   val peopleLimit: Int,
@@ -36,7 +31,7 @@ data class TripDto(
       val routeDto: RouteDto = RouteDto.from(route, points)
       val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
       return TripDto(
-        trip.idTrip,
+        trip.id,
         trip.cost,
         trip.description,
         trip.peopleLimit,
