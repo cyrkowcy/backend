@@ -1,6 +1,5 @@
 package pl.edu.pk.backend.model
 
-import io.vertx.core.Future
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
@@ -43,7 +42,6 @@ data class TripDto(
     }
   }
 }
-
 
 data class TripWithComment(
   val ticket: TripDto,

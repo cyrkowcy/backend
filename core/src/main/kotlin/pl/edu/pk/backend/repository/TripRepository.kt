@@ -15,8 +15,6 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
 class TripRepository(private val pool: PgPool) {
-
-
   fun getTripsByGuideEmail(email: String): Future<List<Trip>> {
     val query = "SELECT * FROM trip t LEFT JOIN user_account u ON t.user_account_id = u.id_user_account " +
       "WHERE u.email = $1"
@@ -244,7 +242,6 @@ class TripRepository(private val pool: PgPool) {
         row.getOffsetDateTime("date_trip"),
         row.getBoolean("active"),
         UserRepository.mapUser(row),
-        //TripRepository.mapPoint(row),
         emptyList()
       )
     }

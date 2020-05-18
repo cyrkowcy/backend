@@ -1,12 +1,10 @@
 package pl.edu.pk.backend.model
 
-import io.vertx.core.Future
-
-data class Route (
+data class Route(
   val name: String
 )
 
-data class RouteDto (
+data class RouteDto(
   val name: String,
   val points: List<Point>
 ) {

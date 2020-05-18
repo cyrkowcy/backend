@@ -3,7 +3,11 @@ package pl.edu.pk.backend.service
 import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
-import pl.edu.pk.backend.model.*
+import pl.edu.pk.backend.model.Point
+import pl.edu.pk.backend.model.Route
+import pl.edu.pk.backend.model.TripCommentDto
+import pl.edu.pk.backend.model.TripDto
+import pl.edu.pk.backend.model.RouteDto
 import pl.edu.pk.backend.repository.TripCommentRepository
 import pl.edu.pk.backend.repository.TripRepository
 import pl.edu.pk.backend.repository.UserRepository
@@ -20,7 +24,7 @@ class TripService(
 
   private fun getRouteAndPoints(routeId: Int): Future<Pair<Route, List<Point>>> {
     return tripRepository.getRoute(routeId)
-      .compose { tripRepository.getPoints(routeId).map { points -> Pair(it,points)}}
+      .compose { tripRepository.getPoints(routeId).map { points -> Pair(it, points) } }
 }
 
   private fun getRoutes(routeId: Int): Future<Route> {
