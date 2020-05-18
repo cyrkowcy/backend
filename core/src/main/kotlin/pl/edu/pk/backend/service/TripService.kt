@@ -1,9 +1,13 @@
 package pl.edu.pk.backend.service
 
+import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
+import pl.edu.pk.backend.model.Point
+import pl.edu.pk.backend.model.Route
 import pl.edu.pk.backend.model.TripCommentDto
 import pl.edu.pk.backend.model.TripDto
+import pl.edu.pk.backend.model.RouteDto
 import pl.edu.pk.backend.repository.TripCommentRepository
 import pl.edu.pk.backend.repository.TripRepository
 import pl.edu.pk.backend.repository.UserRepository
@@ -17,17 +21,30 @@ class TripService(
   private val userRepository: UserRepository,
   private val tripCommentRepository: TripCommentRepository
 ) {
-  fun getTrips(): Future<List<TripDto>> {
-    return tripRepository.getAllTrips().map { it.map { TripDto.from(it) } }
+
+  private fun getRouteAndPoints(routeId: Int): Future<Pair<Route, List<Point>>> {
+    return tripRepository.getRoute(routeId)
+      .compose { tripRepository.getPoints(routeId).map { points -> Pair(it, points) } }
+}
+
+  private fun getRoutes(routeId: Int): Future<Route> {
+    return tripRepository.getRoute(routeId).map { RouteDto.fromRoute(it) }
   }
 
   fun getTrip(email: String, tripId: Int): Future<TripDto> {
-    return tripRepository.getTripByEmail(email, tripId).map { TripDto.from(it) }
+    return tripRepository.getTripByEmail(email, tripId).compose { getRouteAndPoints(it.routeId)
+      .map { (route, points) ->
+        TripDto.from(it, route, points) }
+    }
   }
 
   fun getTrips(email: String): Future<List<TripDto>> {
-    return tripRepository.getTripsByEmail(email)
-      .map { it.map { TripDto.from(it) } }
+return tripRepository.getTripsByGuideEmail(email)
+      .compose { trips ->
+        CompositeFuture.all(trips.map { trip -> getTrip(email, trip.id) })
+      }.map {
+        it.list<TripDto>()
+      }
   }
 
   fun createTrip(
