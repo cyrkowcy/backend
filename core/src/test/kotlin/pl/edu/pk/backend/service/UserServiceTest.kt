@@ -16,6 +16,8 @@ import pl.edu.pk.backend.repository.RoleUserRepository
 import pl.edu.pk.backend.repository.TripRepository
 import pl.edu.pk.backend.repository.UserRepository
 import pl.edu.pk.backend.util.NoSuchResourceException
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 
 @ExtendWith(VertxExtension::class)
 class UserServiceTest {
@@ -53,7 +55,8 @@ class UserServiceTest {
     val repo = mockk<UserRepository>()
     every { repo.getUserByEmail(any()) } returns Future.failedFuture(NoSuchResourceException(""))
     every { repo.getUserByEmail(eq("foo@example.com")) } returns Future.succeededFuture(
-      SensitiveUser(1, "", "", "foo@example.com", "", false, listOf(Role.User))
+      SensitiveUser(1, "", "", "foo@example.com", "", false, listOf(Role.User),
+        OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")))
     )
     return repo
   }
@@ -65,6 +68,6 @@ class UserServiceTest {
   }
 
   private fun mockTripRepository(): TripRepository {
-    return mockk<TripRepository>()
+    return mockk()
   }
 }

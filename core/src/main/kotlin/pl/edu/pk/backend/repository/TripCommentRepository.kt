@@ -10,6 +10,7 @@ import io.vertx.sqlclient.Tuple
 import pl.edu.pk.backend.model.SensitiveUser
 import pl.edu.pk.backend.model.TripComment
 import pl.edu.pk.backend.util.NoSuchResourceException
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
 class TripCommentRepository(private val pool: PgPool) {
@@ -115,6 +116,7 @@ private fun mapCommentAuthor(row: Row): SensitiveUser {
     row.getString("email"),
     row.getString("password"),
     row.getBoolean("disabled"),
-    emptyList()
+    emptyList(),
+    row.getOffsetDateTime("create_date").format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
   )
 }
