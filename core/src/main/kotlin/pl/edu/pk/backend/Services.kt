@@ -16,6 +16,7 @@ class Services(private val vertx: Vertx, private val repositories: Repositories,
       repositories.userRepository,
       repositories.roleUserRepository,
       repositories.tripRepository,
+      tripService,
       jwtService)
   }
   val jwtService by lazy {
