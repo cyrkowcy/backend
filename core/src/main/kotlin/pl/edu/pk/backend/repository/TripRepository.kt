@@ -1,5 +1,4 @@
 package pl.edu.pk.backend.repository
-
 import io.vertx.core.Future
 import io.vertx.core.Promise
 import io.vertx.core.json.JsonObject
@@ -15,7 +14,7 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
 class TripRepository(private val pool: PgPool) {
-  fun getTripsByEmail(email: String): Future<List<Trip>> {
+  fun getTripsByGuideEmail(email: String): Future<List<Trip>> {
     val query = "SELECT * FROM trip t LEFT JOIN user_account u ON t.user_account_id = u.id_user_account " +
       "WHERE u.email = $1"
     return getTrips(query, Tuple.of(email))
@@ -91,7 +90,6 @@ class TripRepository(private val pool: PgPool) {
       "LEFT JOIN user_account u ON t.user_account_id = u.id_user_account WHERE t.id_trip = $1 and u.email = $2"
     return getTrip(query, Tuple.of(tripId, email))
   }
-
   private fun getTrip(query: String, tuple: Tuple): Future<Trip> {
     val promise = Promise.promise<Trip>()
     pool.preparedQuery(query, tuple) { ar ->
@@ -108,7 +106,6 @@ class TripRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
-
   private fun insertRoute(routeName: String): Future<Int> {
     val promise = Promise.promise<Int>()
     pool.preparedQuery("INSERT INTO route (name) VALUES($1) RETURNING id_route",
@@ -121,7 +118,6 @@ class TripRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
-
   fun insertCoordinates(order: Int, coordinates: String, routeId: Int): Future<JsonObject>? {
     val promise = Promise.promise<JsonObject>()
     pool.preparedQuery("INSERT INTO point (order_position, coordinates, route_id) " +
@@ -135,7 +131,6 @@ class TripRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
-
   fun insertTrip(
     userId: Int,
     cost: String,
@@ -147,7 +142,6 @@ class TripRepository(private val pool: PgPool) {
   ): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
     val dateOffset = OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-
     pool.preparedQuery("INSERT INTO trip " +
       "(user_account_id, route_id, cost, description, people_limit, date_trip, active ) " +
       "VALUES($1, $6, $2, $3, $4, $5, $7)",
@@ -160,7 +154,6 @@ class TripRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
-
   fun insertAll(
     userId: Int,
     cost: String,
@@ -180,7 +173,6 @@ class TripRepository(private val pool: PgPool) {
       insertTrip(userId, cost, description, peopleLimit, date, it, active)
     }
   }
-
   fun updateTrip(
     tripId: Int,
     newCost: String?,
@@ -216,7 +208,6 @@ class TripRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
-
   fun updateRoute(newRouteName: String, tripId: Int): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
     pool.preparedQuery("UPDATE route SET name = $1 " +
@@ -230,7 +221,6 @@ class TripRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
-
   fun insertUserTrip(email: String, tripId: Int): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
     pool.preparedQuery("""INSERT INTO trip_user_account (trip_id, user_account_id)
@@ -297,7 +287,6 @@ class TripRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
-
   companion object {
     fun mapTrip(row: Row): Trip {
       return Trip(

@@ -22,7 +22,7 @@ class TripService(
   private val tripCommentRepository: TripCommentRepository
 ) {
 
-  private fun getRouteAndPoints(routeId: Int): Future<Pair<Route, List<Point>>> {
+  fun getRouteAndPoints(routeId: Int): Future<Pair<Route, List<Point>>> {
     return tripRepository.getRoute(routeId)
       .compose { tripRepository.getPoints(routeId).map { points -> Pair(it, points) } }
 }
@@ -39,7 +39,7 @@ class TripService(
   }
 
   fun getTrips(email: String): Future<List<TripDto>> {
-return tripRepository.getTripsByGuideEmail(email)
+    return tripRepository.getTripsByGuideEmail(email)
       .compose { trips ->
         CompositeFuture.all(trips.map { trip -> getTrip(email, trip.id) })
       }.map {
@@ -168,8 +168,7 @@ return tripRepository.getTripsByGuideEmail(email)
   }
 
   fun getComments(tripId: Int): Future<List<TripCommentDto>> {
-    return tripRepository.getTripByTripId(tripId)
-      .compose { tripCommentRepository.getComments(tripId, false) }
+    return tripCommentRepository.getComments(tripId, false)
       .map { it.map { TripCommentDto.from(it) } }
   }
 }

@@ -24,6 +24,7 @@ class UserService(
   private val userRepository: UserRepository,
   private val roleUserRepository: RoleUserRepository,
   private val tripRepository: TripRepository,
+  private val tripService: TripService,
   private val jwtService: JwtService
 ) {
   private val passwordRegex = "^.{6,}$".toRegex()
@@ -169,12 +170,20 @@ class UserService(
 
   fun getUserTrips(email: String): Future<List<TripDto>> {
     return tripRepository.getUserTrips(email)
-      .map { it.map { TripDto.from(it) } }
+      .compose { trips ->
+        CompositeFuture.all(trips.map { trip -> tripService.getTrip(trip.guide.email, trip.id) })
+      }.map {
+        it.list<TripDto>()
+      }
   }
 
   fun getAvailableTrips(description: String): Future<List<TripDto>> {
     return tripRepository.getAvailableTrips(description)
-      .map { it.map { TripDto.from(it) } }
+      .compose { trips ->
+        CompositeFuture.all(trips.map { trip -> tripService.getTrip(trip.guide.email, trip.id) })
+      }.map {
+        it.list<TripDto>()
+      }
   }
 
   fun joinTrip(email: String, tripId: Int): Future<JsonObject> {
