@@ -6,6 +6,8 @@ import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.Tuple
 import pl.edu.pk.backend.model.Trip
+import pl.edu.pk.backend.model.Route
+import pl.edu.pk.backend.model.Point
 import pl.edu.pk.backend.util.NoSuchResourceException
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -39,6 +41,41 @@ class TripRepository(private val pool: PgPool) {
       if (ar.succeeded()) {
         val rows = ar.result()
         promise.complete(rows.map(::mapTrip))
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
+  fun getRoute(routeId: Int): Future<Route> {
+    val promise = Promise.promise<Route>()
+    pool.preparedQuery("SELECT * FROM route WHERE id_route = $1", Tuple.of(routeId)) { ar ->
+      if (ar.succeeded()) {
+        val rows = ar.result()
+        if (rows.size() == 0) {
+          promise.fail(NoSuchResourceException("No such route with such id"))
+        } else {
+          promise.complete(TripRepository.mapRoute(rows.first()))
+        }
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
+  fun getPoints(routeId: Int): Future<List<Point>> {
+    val promise = Promise.promise<List<Point>>()
+    pool.preparedQuery("SELECT * FROM point WHERE route_id=$1",
+      Tuple.of(routeId)) { ar ->
+      if (ar.succeeded()) {
+        val rows = ar.result()
+        if (rows.size() == 0) {
+          promise.fail(NoSuchResourceException("No such route with such id"))
+        } else {
+          promise.complete(rows.map(::mapPoint))
+        }
       } else {
         promise.fail(ar.cause())
       }
@@ -255,14 +292,26 @@ class TripRepository(private val pool: PgPool) {
     fun mapTrip(row: Row): Trip {
       return Trip(
         row.getInteger("id_trip"),
-        UserRepository.mapUser(row),
         row.getInteger("route_id"),
         row.getString("cost"),
         row.getString("description"),
         row.getInteger("people_limit"),
         row.getOffsetDateTime("date_trip"),
         row.getBoolean("active"),
+        UserRepository.mapUser(row),
         emptyList()
+      )
+    }
+    fun mapPoint(row: Row): Point {
+      return Point(
+        row.getInteger("order_position"),
+        row.getString("coordinates")
+      )
+    }
+
+    fun mapRoute(row: Row): Route {
+      return Route(
+        row.getString("name")
       )
     }
   }
