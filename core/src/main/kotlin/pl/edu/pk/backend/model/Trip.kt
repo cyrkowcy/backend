@@ -1,53 +1,63 @@
 package pl.edu.pk.backend.model
 
+import io.vertx.core.Future
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 data class Trip(
   val idTrip: Int,
-  val userAccountId: SensitiveUser,
   val routeId: Int,
   val cost: String,
   val description: String,
   val peopleLimit: Int,
   val dateTrip: OffsetDateTime,
   val active: Boolean,
+  val guide: SensitiveUser,
+  //val route: Route,
   val comments: List<TripComment>
-)
+){
+  fun getRoute(): Int {
+    return routeId
+  }
+}
 
 data class TripDto(
   val idTrip: Int,
-  val routeId: Int,
   val cost: String,
-  val guide: String,
   val description: String,
+  val peopleLimit: Int,
   val dateTrip: String,
-  val active: Boolean
+  val active: Boolean,
+  val guide: User,
+  val route: RouteDto
 ) {
   companion object {
-    fun from(trip: Trip): TripDto {
+    fun from(trip: Trip, route: Route, points: List<Point>): TripDto {
+      val routeDto: RouteDto = RouteDto.from(route, points)
       val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")
       return TripDto(
         trip.idTrip,
-        trip.routeId,
         trip.cost,
-        trip.userAccountId.email,
         trip.description,
+        trip.peopleLimit,
         trip.dateTrip.format(formatter),
-        trip.active
+        trip.active,
+        trip.guide.toUser(),
+        routeDto
       )
     }
   }
 }
+
 
 data class TripWithComment(
   val ticket: TripDto,
   val comments: List<TripCommentDto>
 ) {
   companion object {
-    fun from(trip: Trip): TripWithComment {
+    fun from(trip: Trip, route: Route, points: List<Point>): TripWithComment {
       return TripWithComment(
-        TripDto.from(trip),
+        TripDto.from(trip, route, points),
         trip.comments.map { TripCommentDto.from(it) }
       )
     }
