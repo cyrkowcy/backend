@@ -3,12 +3,14 @@ package pl.edu.pk.backend.repository
 import io.vertx.core.Future
 import io.vertx.core.Promise
 import io.vertx.core.json.JsonObject
+import io.vertx.pgclient.PgException
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.Tuple
 import pl.edu.pk.backend.model.SensitiveUser
 import pl.edu.pk.backend.model.TripComment
 import pl.edu.pk.backend.util.NoSuchResourceException
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
 class TripCommentRepository(private val pool: PgPool) {
@@ -60,7 +62,11 @@ class TripCommentRepository(private val pool: PgPool) {
       if (ar.succeeded()) {
         promise.complete()
       } else {
-        promise.fail(ar.cause())
+        if (ar.cause() is PgException && (ar.cause() as PgException).code == "23503") {
+          promise.fail(NoSuchResourceException("No such trip with id: $tripId"))
+        } else {
+          promise.fail(ar.cause())
+        }
       }
     }
     return promise.future()
@@ -110,6 +116,7 @@ private fun mapCommentAuthor(row: Row): SensitiveUser {
     row.getString("email"),
     row.getString("password"),
     row.getBoolean("disabled"),
-    emptyList()
+    emptyList(),
+    row.getOffsetDateTime("create_date").format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
   )
 }

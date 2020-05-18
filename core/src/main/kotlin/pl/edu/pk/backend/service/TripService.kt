@@ -39,7 +39,7 @@ class TripService(
   }
 
   fun getTrips(email: String): Future<List<TripDto>> {
-    return tripRepository.getTripsByGuideEmail(email)
+return tripRepository.getTripsByGuideEmail(email)
       .compose { trips ->
         CompositeFuture.all(trips.map { trip -> getTrip(email, trip.id) })
       }.map {
@@ -168,7 +168,8 @@ class TripService(
   }
 
   fun getComments(tripId: Int): Future<List<TripCommentDto>> {
-    return tripCommentRepository.getComments(tripId, false)
+    return tripRepository.getTripByTripId(tripId)
+      .compose { tripCommentRepository.getComments(tripId, false) }
       .map { it.map { TripCommentDto.from(it) } }
   }
 }

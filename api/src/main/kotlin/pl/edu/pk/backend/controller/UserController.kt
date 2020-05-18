@@ -85,4 +85,26 @@ class UserController(private val userService: UserService) {
       )
     )
   }
+
+  fun getUserTrips(ctx: RoutingContext) {
+    val email = ctx.getCurrentUserEmail()
+    ctx.handleResult(userService.getUserTrips(email))
+  }
+
+  fun getAvailableTripsForUser(ctx: RoutingContext) {
+    val description = ctx.queryParam("description").firstOrNull() ?: ""
+    ctx.handleResult(userService.getAvailableTrips(description))
+  }
+
+  fun postUserTrip(ctx: RoutingContext) {
+    val email = ctx.getCurrentUserEmail()
+    val tripId = ctx.pathParam("tripId")
+    ctx.handleResult(userService.joinTrip(email, tripId.toInt()))
+  }
+
+  fun deleteUserTrip(ctx: RoutingContext) {
+    val email = ctx.getCurrentUserEmail()
+    val tripId = ctx.pathParam("tripId")
+    ctx.handleResult(userService.deleteUserTrip(email, tripId.toInt()))
+  }
 }

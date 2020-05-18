@@ -32,24 +32,28 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
     router.post("/user").handler(::postUser)
     router.post("/login").handler(::postLogin)
     router.patch("/user/:email").handler(::patchUser)
+    router.get("/user/trips").handler(::getUserTrips)
+    router.post("/user/trips/:tripId").handler(::postUserTrip)
+    router.get("/user/trips/active").handler(::getAvailableTripsForUser)
+    router.delete("/user/trips/:tripId").handler(::deleteUserTrip)
   }
 
   with(controllers.ticketController) {
-    router.get("/ticket").handler(::getTickets)
-    router.get("/ticket/:ticketId").handler(::getTicket)
-    router.post("/ticket").handler(::postTicket)
-    router.post("/ticket/:ticketId/comment").handler(::postComment)
-    router.patch("/ticket/:ticketId").handler(::patchTicket)
+    router.get("/tickets").handler(::getTickets)
+    router.get("/tickets/:ticketId").handler(::getTicket)
+    router.post("/tickets").handler(::postTicket)
+    router.post("/tickets/:ticketId/comments").handler(::postComment)
+    router.patch("/tickets/:ticketId").handler(::patchTicket)
   }
 
   with(controllers.tripController) {
     router.get("/trips").handler(::getTrips)
-    router.get("/trip/:tripId").handler(::getTrip)
-    router.post("/trip").handler(::postTrip)
-    router.patch("/trip/:tripId").handler(::patchTrip)
-    router.get("/trip/:tripId/comments").handler(::getTripComments)
-    router.post("/trip/:tripId/comment").handler(::createTripComment)
-    router.patch("/trip/:tripId/comment/:commentId").handler(::patchTripComment)
+    router.get("/trips/:tripId").handler(::getTrip)
+    router.post("/trips").handler(::postTrip)
+    router.patch("/trips/:tripId").handler(::patchTrip)
+    router.get("/trips/:tripId/comments").handler(::getTripComments)
+    router.post("/trips/:tripId/comments").handler(::createTripComment)
+    router.patch("/trips/:tripId/comments/:commentId").handler(::patchTripComment)
   }
 
   router.route().handler(StaticHandler.create().setCachingEnabled(false))

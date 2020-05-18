@@ -8,6 +8,8 @@ import io.vertx.sqlclient.Tuple
 import pl.edu.pk.backend.model.SensitiveUser
 import pl.edu.pk.backend.model.User
 import pl.edu.pk.backend.util.NoSuchResourceException
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
 class UserRepository(private val pool: PgPool) {
@@ -43,12 +45,14 @@ class UserRepository(private val pool: PgPool) {
 
   fun insertUser(firstName: String, lastName: String, email: String, password: String): Future<User> {
     val promise = Promise.promise<User>()
+    val createDate = OffsetDateTime.now()
     pool.preparedQuery(
-      "INSERT INTO user_account (first_name, last_name, email, password) VALUES($1, $2, $3, $4)",
-      Tuple.of(firstName, lastName, email, password)
+      "INSERT INTO user_account (first_name, last_name, email, password, create_date) VALUES($1, $2, $3, $4, $5)",
+      Tuple.of(firstName, lastName, email, password, createDate)
     ) { ar ->
       if (ar.succeeded()) {
-        promise.complete(User(firstName, lastName, email, false, emptyList()))
+        promise.complete(User(firstName, lastName, email, false, emptyList(),
+          createDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))))
       } else {
         promise.fail(ar.cause())
       }
@@ -101,7 +105,8 @@ class UserRepository(private val pool: PgPool) {
         row.getString("email"),
         row.getString("password"),
         row.getBoolean("disabled"),
-        emptyList()
+        emptyList(),
+        row.getOffsetDateTime("create_date").format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
       )
     }
   }
