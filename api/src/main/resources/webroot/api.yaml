@@ -389,7 +389,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Trip'
+              $ref: '#/components/schemas/NewTrip'
         required: true
       responses:
         "200":
@@ -446,7 +446,7 @@ Non-admin user can only patch themselves. Admin can patch anyone."
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Trip'
+              $ref: '#/components/schemas/NewTrip'
         required: true
       responses:
         "200":
@@ -722,6 +722,21 @@ components:
           type: boolean
         guide:
           $ref: '#/components/schemas/User'
+        route:
+          $ref: '#/components/schemas/TripRoute'
+    NewTrip:
+      type: object
+      properties:
+        cost:
+          type: integer
+        description:
+          type: string
+        peopleLimit:
+          type: integer
+        dateTrip:
+          type: string
+        active:
+          type: boolean
         route:
           $ref: '#/components/schemas/TripRoute'
     Trips:
