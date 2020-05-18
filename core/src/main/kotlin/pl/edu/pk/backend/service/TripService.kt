@@ -23,9 +23,9 @@ class TripService(
       .compose { tripRepository.getPoints(routeId).map { points -> Pair(it,points)}}
 }
 
-//  private fun getRoutes(routeId: Int): Future<Route> {
-//    return tripRepository.getRoute(routeId).map { Route }
-//  }
+  private fun getRoutes(routeId: Int): Future<Route> {
+    return tripRepository.getRoute(routeId).map { RouteDto.fromRoute(it) }
+  }
 
   fun getTrip(email: String, tripId: Int): Future<TripDto> {
     return tripRepository.getTripByEmail(email, tripId).compose { getRouteAndPoints(it.routeId)
@@ -36,7 +36,11 @@ class TripService(
 
   fun getTrips(email: String): Future<List<TripDto>> {
     return tripRepository.getTripsByGuideEmail(email)
-      .map { it.map { TripDto.from(it, tripRepository.getRoute(it.routeId),  } }
+      .compose { trips ->
+        CompositeFuture.all(trips.map { trip -> getTrip(email, trip.idTrip) })
+      }.map {
+        it.list<TripDto>()
+      }
   }
 
   fun createTrip(

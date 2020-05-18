@@ -14,8 +14,9 @@ data class RouteDto (
     fun from(route: Route, points: List<Point>): RouteDto {
       return RouteDto(route.name, points)
     }
-//    fun fromRoute(route: Route): Route {
-//      return Route(route.name)
-//    }
+
+    fun fromRoute(route: Route): Route {
+      return Route(route.name)
+    }
   }
 }
