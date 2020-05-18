@@ -27,6 +27,7 @@ class UserServiceTest {
       mockUserRepository(),
       mockRoleUserRepository(),
       mockTripRepository(),
+      mockTripService(),
       mockk(relaxed = true))
 
     val result = service.getUserByEmail("foo@example.com")
@@ -42,6 +43,7 @@ class UserServiceTest {
       mockUserRepository(),
       mockk(relaxed = true),
       mockTripRepository(),
+      mockTripService(),
       mockk(relaxed = true))
 
     val result = service.getUserByEmail("bar")
@@ -68,6 +70,10 @@ class UserServiceTest {
   }
 
   private fun mockTripRepository(): TripRepository {
+    return mockk()
+  }
+
+  private fun mockTripService(): TripService {
     return mockk()
   }
 }
