@@ -69,10 +69,10 @@ class TripController(private val tripService: TripService) {
     val newDateTrip: String? = body.getString("DateTrip")
     val active: Boolean? = body.getBoolean("active")
     val route: JsonObject = body.getJsonObject("route")
-    val newRouteName: String = route.getString("name", "")
+    val newRouteName: String? = route.getString("name", "")
     val points: JsonArray = route.getJsonArray("points")
-    val newFirstOrderPosition = (points.getJsonObject(0).getString("coordinates"))
-    val newSecondOrderPosition = (points.getJsonObject(1).getString("coordinates"))
+    val newFirstOrderPosition: String? = (points.getJsonObject(0).getString("coordinates"))
+    val newSecondOrderPosition: String? = (points.getJsonObject(1).getString("coordinates"))
 
     val newCost: String? = newICost.toString()
 

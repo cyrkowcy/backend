@@ -15,6 +15,7 @@ import pl.edu.pk.backend.util.AuthorizationException
 import pl.edu.pk.backend.util.ValidationException
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 class TripService(
   private val tripRepository: TripRepository,
@@ -22,7 +23,7 @@ class TripService(
   private val tripCommentRepository: TripCommentRepository
 ) {
 
-  fun getRouteAndPoints(routeId: Int): Future<Pair<Route, List<Point>>> {
+  private fun getRouteAndPoints(routeId: Int): Future<Pair<Route, List<Point>>> {
     return tripRepository.getRoute(routeId)
       .compose { tripRepository.getPoints(routeId).map { points -> Pair(it, points) } }
 }
@@ -38,6 +39,15 @@ class TripService(
     }
   }
 
+  private fun getTripById(tripId: Int): Future<TripDto> {
+    return tripRepository.getTripByTripId(tripId).compose {
+      getRouteAndPoints(it.routeId)
+        .map { (route, points) ->
+          TripDto.from(it, route, points)
+        }
+    }
+  }
+
   fun getTrips(email: String): Future<List<TripDto>> {
     return tripRepository.getTripsByGuideEmail(email)
       .compose { trips ->
@@ -45,6 +55,16 @@ class TripService(
       }.map {
         it.list<TripDto>()
       }
+  }
+
+  private fun validateDate(dateToValidate: String): Boolean {
+    val data: OffsetDateTime
+    try {
+        data = OffsetDateTime.parse(dateToValidate)
+        return true
+    } catch (e: DateTimeParseException) {
+      return false
+    }
   }
 
   fun createTrip(
@@ -62,13 +82,14 @@ class TripService(
   ): Future<JsonObject> {
     if (cost.isBlank() or description.isBlank() or routeName.isBlank() or firstOrderPosition.isBlank()
       or secondOrderPosition.isBlank() or active == null) {
-      return Future.failedFuture(ValidationException("Lack of inforamtions"))
+      return Future.failedFuture(ValidationException("Lack of informations"))
     }
     if ((peopleLimit < 1)) {
-      return Future.failedFuture(ValidationException("People Limit can't be smaller than 1"))
+      return Future.failedFuture(ValidationException("People Limit can't be lower than 1"))
     }
-    if (OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME).isBefore(OffsetDateTime.now())) {
-      return Future.failedFuture(ValidationException("Wrong date"))
+    if (!validateDate(date) ||
+      OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME).isBefore(OffsetDateTime.now())) {
+      return Future.failedFuture(ValidationException("Wrong date or format (yyyy-MM-ddTHH:mm+01:00)"))
     }
     return userRepository.getUserByEmail(email)
       .compose { user ->
@@ -102,7 +123,7 @@ class TripService(
     var newDateTripOffset: OffsetDateTime? = null
     if (newDateTrip != null) {
       newDateTripOffset = OffsetDateTime.parse(newDateTrip)
-      if (newDateTripOffset.isBefore(OffsetDateTime.now()))
+      if (!validateDate(newDateTrip) || newDateTripOffset.isBefore(OffsetDateTime.now()))
         return Future.failedFuture(ValidationException("Wrong date."))
     }
 

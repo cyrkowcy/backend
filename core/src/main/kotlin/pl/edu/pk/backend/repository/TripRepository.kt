@@ -145,7 +145,7 @@ class TripRepository(private val pool: PgPool) {
     val dateOffset = OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
     pool.preparedQuery("INSERT INTO trip " +
       "(user_account_id, route_id, cost, description, people_limit, date_trip, active ) " +
-      "VALUES($1, $6, $2, $3, $4, $5, $7)",
+      "VALUES($1, $6, $2, $3, $4, $5, $7) RETURNING id_trip",
       Tuple.of(userId, cost, description, peopleLimit, dateOffset, routeId, active)) { ar ->
       if (ar.succeeded()) {
         promise.complete(JsonObject().put("description", description))
