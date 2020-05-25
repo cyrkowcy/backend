@@ -76,10 +76,6 @@ class TripService(
     active: Boolean,
     routeName: String,
     points: JsonArray,
-//    order1: Int,
-//    order2: Int,
-//    firstOrderPosition: String,
-//    secondOrderPosition: String,
     email: String
   ): Future<JsonObject> {
     if (cost.isBlank() or description.isBlank() or routeName.isBlank() or active == null) {
@@ -103,10 +99,6 @@ class TripService(
           active,
           routeName,
           points
-//          order1,
-//          order2,
-//          firstOrderPosition,
-//          secondOrderPosition
         )
       }
   }
