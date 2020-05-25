@@ -123,7 +123,7 @@ class TripRepository(private val pool: PgPool) {
   fun insertCoordinates(points: JsonArray, routeId: Int): Future<JsonObject>? {
     val promise = Promise.promise<JsonObject>()
     var i: Int = 0
-    while (i<points.size()) {
+    while (i < points.size()) {
       val order = points.getJsonObject(i).getInteger("order")
       val coordinates = points.getJsonObject(i).getString("coordinates")
       pool.preparedQuery("INSERT INTO point (order_position, coordinates, route_id) " +
