@@ -37,7 +37,7 @@ class TripController(private val tripService: TripService) {
     val routeName: String = route.getString("name", "")
     val points: JsonArray = route.getJsonArray("points")
 
-    if(points.size()<2) {
+    if ( points.size() < 2 ) {
       ctx.failValidation(ApiError.Body, "At least two points required")
       return
     }
