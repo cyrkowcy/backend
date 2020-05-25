@@ -36,10 +36,11 @@ class TripController(private val tripService: TripService) {
     val route: JsonObject = body.getJsonObject("route")
     val routeName: String = route.getString("name", "")
     val points: JsonArray = route.getJsonArray("points")
-    val order1 = (points.getJsonObject(0).getInteger("order"))
-    val firstOrderPosition = (points.getJsonObject(0).getString("coordinates"))
-    val order2 = (points.getJsonObject(1).getInteger("order"))
-    val secondOrderPosition = (points.getJsonObject(1).getString("coordinates"))
+
+    if(points.size()<2) {
+      ctx.failValidation(ApiError.Body, "At least two points required")
+      return
+    }
 
     val cost = iCost.toString()
 
@@ -50,10 +51,7 @@ class TripController(private val tripService: TripService) {
       dateTrip,
       active,
       routeName,
-      order1,
-      order2,
-      firstOrderPosition,
-      secondOrderPosition,
+      points,
       ctx.getCurrentUserEmail()))
   }
 

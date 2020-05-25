@@ -1,6 +1,7 @@
 package pl.edu.pk.backend.app
 
 import io.vertx.core.Future
+import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import org.apache.logging.log4j.LogManager
 import pl.edu.pk.backend.Services
@@ -99,6 +100,10 @@ class InitDatabase(val services: Services) {
 
   fun addTrips(): Future<JsonObject> {
     logger.info("Adding trips")
+    val order: Int = 1
+    val point: JsonObject = JsonObject("""{"order": $order, "coordinates": "41°24'12.2\"N 2°10'26.5\"E" }""")
+    val array: JsonArray = JsonArray()
+    array.add(point)
     return services.tripService.createTrip(
       "50",
       "Tour around Cracow city.",
@@ -106,10 +111,7 @@ class InitDatabase(val services: Services) {
       "2021-05-03T10:15:30+01:00",
       true,
       "Grodzka",
-      1,
-      2,
-      "41°24'12.2\"N 2°10'26.5\"E",
-      "41°26'12.2\"N 2°15'26.5\"E",
+      array,
       "anna@anna.pl"
     ).compose {
       services.tripService.createComment(
@@ -137,10 +139,7 @@ class InitDatabase(val services: Services) {
           "2020-05-10T10:15:30+01:00",
           false,
           "Bulwary",
-          1,
-          2,
-          "41°24'12.2\"N 2°10'26.5\"E",
-          "41°26'12.2\"N 2°15'26.5\"E",
+          array,
           "anna@anna.pl"
         ).compose {
           services.tripService.createComment(
