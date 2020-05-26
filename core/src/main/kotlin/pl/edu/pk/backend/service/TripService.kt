@@ -110,9 +110,10 @@ class TripService(
     newPeopleLimit: Int?,
     newDateTrip: String?,
     active: Boolean?,
-    newRouteName: String?,
-    newFirstOrderPosition: String?,
-    newSecondOrderPosition: String?
+    newRoute: JsonObject?
+//    newRouteName: String?,
+//    newFirstOrderPosition: String?,
+//    newSecondOrderPosition: String?
   ): Future<JsonObject> {
     var newDateTripOffset: OffsetDateTime? = null
     if (newDateTrip != null) {

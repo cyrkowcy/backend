@@ -66,23 +66,25 @@ class TripController(private val tripService: TripService) {
     val newPeopleLimit: Int? = body.getInteger("peopleLimit")
     val newDateTrip: String? = body.getString("DateTrip")
     val active: Boolean? = body.getBoolean("active")
-    val route: JsonObject = body.getJsonObject("route")
-    val newRouteName: String? = route.getString("name", "")
-    val points: JsonArray = route.getJsonArray("points")
-    val newFirstOrderPosition: String? = (points.getJsonObject(0).getString("coordinates"))
-    val newSecondOrderPosition: String? = (points.getJsonObject(1).getString("coordinates"))
+    val newRoute: JsonObject? = body.getJsonObject("route")
+//    val newRouteName: String? = route.getString("name", "")
+//    val points: JsonArray = route.getJsonArray("points")
+//    val newFirstOrderPosition: String? = (points.getJsonObject(0).getString("coordinates"))
+//    val newSecondOrderPosition: String? = (points.getJsonObject(1).getString("coordinates"))
 
     val newCost: String? = newICost.toString()
 
     if (listOf(newCost,
         newDescription,
-        newRouteName,
+//        newRouteName,
         newPeopleLimit,
         newDateTrip,
         active,
-        newRouteName,
-        newFirstOrderPosition,
-        newSecondOrderPosition).all { it == null }) {
+//        newRouteName,
+//        newFirstOrderPosition,
+//        newSecondOrderPosition
+        newRoute
+      ).all { it == null }) {
       ctx.failValidation(ApiError.Body, "At least one parameter is required for trip patch")
       return
     }
@@ -93,9 +95,10 @@ class TripController(private val tripService: TripService) {
       newPeopleLimit,
       newDateTrip,
       active,
-      newRouteName,
-      newFirstOrderPosition,
-      newSecondOrderPosition
+      newRoute
+//      newRouteName,
+//      newFirstOrderPosition,
+//      newSecondOrderPosition
     ))
   }
 
