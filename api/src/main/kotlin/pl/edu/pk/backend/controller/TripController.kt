@@ -76,29 +76,22 @@ class TripController(private val tripService: TripService) {
 
     if (listOf(newCost,
         newDescription,
-//        newRouteName,
         newPeopleLimit,
         newDateTrip,
         active,
-//        newRouteName,
-//        newFirstOrderPosition,
-//        newSecondOrderPosition
         newRoute
       ).all { it == null }) {
       ctx.failValidation(ApiError.Body, "At least one parameter is required for trip patch")
       return
     }
     ctx.handleResult(tripService.patchTrip(
+      body,
       tripId.toInt(),
       newCost,
       newDescription,
       newPeopleLimit,
       newDateTrip,
-      active,
-      newRoute
-//      newRouteName,
-//      newFirstOrderPosition,
-//      newSecondOrderPosition
+      active
     ))
   }
 

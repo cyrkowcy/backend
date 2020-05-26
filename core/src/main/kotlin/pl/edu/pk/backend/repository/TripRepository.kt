@@ -227,16 +227,21 @@ class TripRepository(private val pool: PgPool) {
     return promise.future()
   }
 
-  fun updateCoordinate(newFirstOrderPosition: String, tripId: Int, pointNumber: Int): Future<JsonObject> {
+  fun updateCoordinate(points: JsonArray, tripId: Int): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
-    pool.preparedQuery("UPDATE point SET coordinates = $1 " +
-      "WHERE point.route_id = (SELECT route_id FROM trip WHERE id_trip = $2) AND order_position =$3",
-      Tuple.of(newFirstOrderPosition, tripId, pointNumber)) { ar ->
-      if (ar.succeeded()) {
-        promise.complete(JsonObject().put("coordinates", newFirstOrderPosition))
-      } else {
-        promise.fail(ar.cause())
+    var i: Int = 0
+    while (i < points.size()) {
+      pool.preparedQuery("UPDATE point SET coordinates = $1 " +
+        "WHERE point.route_id = (SELECT route_id FROM trip WHERE id_trip = $2) AND order_position =$3",
+        Tuple.of(points.getJsonObject(i).getString("coordinates"), tripId,
+          points.getJsonObject(i).getInteger("order"))) { ar ->
+        if (ar.succeeded()) {
+          promise.complete(JsonObject().put("coordinates", points.getJsonObject(i).getInteger("order")))
+        } else {
+          promise.fail(ar.cause())
+        }
       }
+      i++
     }
     return promise.future()
   }
