@@ -1,6 +1,7 @@
 package pl.edu.pk.backend.repository
 import io.vertx.core.Future
 import io.vertx.core.Promise
+import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.pgclient.PgPool
 import io.vertx.sqlclient.Row
@@ -119,19 +120,26 @@ class TripRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
-  fun insertCoordinates(order: Int, coordinates: String, routeId: Int): Future<JsonObject>? {
+  fun insertCoordinates(points: JsonArray, routeId: Int): Future<JsonObject>? {
     val promise = Promise.promise<JsonObject>()
-    pool.preparedQuery("INSERT INTO point (order_position, coordinates, route_id) " +
-      "VALUES($1, $2, $3)",
-      Tuple.of(order, coordinates, routeId)) { ar ->
-      if (ar.succeeded()) {
-        promise.complete()
-      } else {
-        promise.fail(ar.cause())
+    var i: Int = 0
+    while (i < points.size()) {
+      val order = points.getJsonObject(i).getInteger("order")
+      val coordinates = points.getJsonObject(i).getString("coordinates")
+      pool.preparedQuery("INSERT INTO point (order_position, coordinates, route_id) " +
+        "VALUES($1, $2, $3)",
+        Tuple.of(order, coordinates, routeId)) { ar ->
+        if (ar.succeeded()) {
+          promise.complete()
+        } else {
+          promise.fail(ar.cause())
+        }
       }
+      i++
     }
     return promise.future()
   }
+
   fun insertTrip(
     userId: Int,
     cost: String,
@@ -163,14 +171,10 @@ class TripRepository(private val pool: PgPool) {
     date: String,
     active: Boolean,
     routeName: String,
-    order1: Int,
-    order2: Int,
-    firstOrderPosition: String,
-    secondOrderPosition: String
+    points: JsonArray
   ): Future<JsonObject> {
     return insertRoute(routeName).compose {
-      insertCoordinates(order1, firstOrderPosition, it)
-      insertCoordinates(order2, secondOrderPosition, it)
+      insertCoordinates(points, it)
       insertTrip(userId, cost, description, peopleLimit, date, it, active)
     }
   }
@@ -222,6 +226,21 @@ class TripRepository(private val pool: PgPool) {
     }
     return promise.future()
   }
+
+  fun updateCoordinate(newFirstOrderPosition: String, tripId: Int, pointNumber: Int): Future<JsonObject> {
+    val promise = Promise.promise<JsonObject>()
+    pool.preparedQuery("UPDATE point SET coordinates = $1 " +
+      "WHERE point.route_id = (SELECT route_id FROM trip WHERE id_trip = $2) AND order_position =$3",
+      Tuple.of(newFirstOrderPosition, tripId, pointNumber)) { ar ->
+      if (ar.succeeded()) {
+        promise.complete(JsonObject().put("coordinates", newFirstOrderPosition))
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
+  }
+
   fun insertUserTrip(email: String, tripId: Int): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
     pool.preparedQuery("""INSERT INTO trip_user_account (trip_id, user_account_id)
@@ -275,19 +294,6 @@ class TripRepository(private val pool: PgPool) {
     return promise.future()
   }
 
-  fun updateCoordinate(newFirstOrderPosition: String, tripId: Int, pointNumber: Int): Future<JsonObject> {
-    val promise = Promise.promise<JsonObject>()
-    pool.preparedQuery("UPDATE point SET coordinates = $1 " +
-      "WHERE point.route_id = (SELECT route_id FROM trip WHERE id_trip = $2) AND order_position =$3",
-      Tuple.of(newFirstOrderPosition, tripId, pointNumber)) { ar ->
-      if (ar.succeeded()) {
-        promise.complete(JsonObject().put("coordinates", newFirstOrderPosition))
-      } else {
-        promise.fail(ar.cause())
-      }
-    }
-    return promise.future()
-  }
   companion object {
     fun mapTrip(row: Row): Trip {
       return Trip(

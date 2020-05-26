@@ -2,6 +2,7 @@ package pl.edu.pk.backend.service
 
 import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
+import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import pl.edu.pk.backend.model.TripCommentDto
 import pl.edu.pk.backend.model.TripDto
@@ -74,14 +75,10 @@ class TripService(
     date: String,
     active: Boolean,
     routeName: String,
-    order1: Int,
-    order2: Int,
-    firstOrderPosition: String,
-    secondOrderPosition: String,
+    points: JsonArray,
     email: String
   ): Future<JsonObject> {
-    if (cost.isBlank() or description.isBlank() or routeName.isBlank() or firstOrderPosition.isBlank()
-      or secondOrderPosition.isBlank() or active == null) {
+    if (cost.isBlank() or description.isBlank() or routeName.isBlank() or active == null) {
       return Future.failedFuture(ValidationException("Lack of informations"))
     }
     if ((peopleLimit < 1)) {
@@ -101,10 +98,7 @@ class TripService(
           date,
           active,
           routeName,
-          order1,
-          order2,
-          firstOrderPosition,
-          secondOrderPosition
+          points
         )
       }
   }
