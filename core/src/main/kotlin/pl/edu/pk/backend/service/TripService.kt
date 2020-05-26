@@ -127,11 +127,10 @@ class TripService(
       if (body.getJsonObject("route").containsKey("name")) {
         tripRepository.updateRoute(body.getJsonObject("route").getString("name"), tripId)
       }
-      if(body.getJsonObject("route").containsKey("points")) {
+      if (body.getJsonObject("route").containsKey("points")) {
         return tripRepository.updateCoordinate(body.getJsonObject("route").getJsonArray("points"), tripId)
       }
-      return Future.future { JsonObject("""{"cost": $newCost, "description": $newDescription,
-        | "peopleLimit": $newPeopleLimit, "date": $newDateTripOffset}""".trimMargin()) }
+      return Future.future { JsonObject("""{"cost": $newCost}""".trimMargin()) }
     }
     return Future.future()
   }
