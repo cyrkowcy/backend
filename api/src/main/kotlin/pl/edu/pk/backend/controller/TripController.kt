@@ -66,36 +66,28 @@ class TripController(private val tripService: TripService) {
     val newPeopleLimit: Int? = body.getInteger("peopleLimit")
     val newDateTrip: String? = body.getString("DateTrip")
     val active: Boolean? = body.getBoolean("active")
-    val route: JsonObject = body.getJsonObject("route")
-    val newRouteName: String? = route.getString("name", "")
-    val points: JsonArray = route.getJsonArray("points")
-    val newFirstOrderPosition: String? = (points.getJsonObject(0).getString("coordinates"))
-    val newSecondOrderPosition: String? = (points.getJsonObject(1).getString("coordinates"))
+    val newRoute: JsonObject? = body.getJsonObject("route")
 
     val newCost: String? = newICost.toString()
 
     if (listOf(newCost,
         newDescription,
-        newRouteName,
         newPeopleLimit,
         newDateTrip,
         active,
-        newRouteName,
-        newFirstOrderPosition,
-        newSecondOrderPosition).all { it == null }) {
+        newRoute
+      ).all { it == null }) {
       ctx.failValidation(ApiError.Body, "At least one parameter is required for trip patch")
       return
     }
     ctx.handleResult(tripService.patchTrip(
+      body,
       tripId.toInt(),
       newCost,
       newDescription,
       newPeopleLimit,
       newDateTrip,
-      active,
-      newRouteName,
-      newFirstOrderPosition,
-      newSecondOrderPosition
+      active
     ))
   }
 

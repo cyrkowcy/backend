@@ -77,7 +77,7 @@ class TripService(
     routeName: String,
     points: JsonArray,
     email: String
-  ): Future<JsonObject> {
+  ): Future<TripDto> {
     if (cost.isBlank() or description.isBlank() or routeName.isBlank() or active == null) {
       return Future.failedFuture(ValidationException("Lack of informations"))
     }
@@ -91,7 +91,7 @@ class TripService(
     return userRepository.getUserByEmail(email)
       .compose { user ->
         tripRepository.insertAll(
-          user.id,
+          user,
           cost,
           description,
           peopleLimit,
@@ -104,15 +104,13 @@ class TripService(
   }
 
   fun patchTrip(
+    body: JsonObject,
     tripId: Int,
     newCost: String?,
     newDescription: String?,
     newPeopleLimit: Int?,
     newDateTrip: String?,
-    active: Boolean?,
-    newRouteName: String?,
-    newFirstOrderPosition: String?,
-    newSecondOrderPosition: String?
+    active: Boolean?
   ): Future<JsonObject> {
     var newDateTripOffset: OffsetDateTime? = null
     if (newDateTrip != null) {
@@ -121,34 +119,18 @@ class TripService(
         return Future.failedFuture(ValidationException("Wrong date."))
     }
 
-    if ((newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null ||
-        active != null) &&
-      (newRouteName != null || newRouteName != null || newFirstOrderPosition != null ||
-        newSecondOrderPosition != null)) {
-      if (newRouteName != null) {
-        tripRepository.updateRoute(newRouteName, tripId)
-      }
-      if (newFirstOrderPosition != null) {
-        tripRepository.updateCoordinate(newFirstOrderPosition, tripId, 1)
-      }
-      if (newSecondOrderPosition != null) {
-        tripRepository.updateCoordinate(newSecondOrderPosition, tripId, 2)
-      }
-      return tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
-    }
-
     if (newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null ||
       active != null) {
-      return tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
+      tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
     }
-    if (newRouteName != null) {
-      return tripRepository.updateRoute(newRouteName, tripId)
-    }
-    if (newFirstOrderPosition != null) {
-      return tripRepository.updateCoordinate(newFirstOrderPosition, tripId, 1)
-    }
-    if (newSecondOrderPosition != null) {
-      return tripRepository.updateCoordinate(newSecondOrderPosition, tripId, 2)
+    if (body.containsKey("route")) {
+      if (body.getJsonObject("route").containsKey("name")) {
+        tripRepository.updateRoute(body.getJsonObject("route").getString("name"), tripId)
+      }
+      if (body.getJsonObject("route").containsKey("points")) {
+        return tripRepository.updateCoordinate(body.getJsonObject("route").getJsonArray("points"), tripId)
+      }
+      return Future.future { JsonObject("""{"cost": $newCost}""".trimMargin()) }
     }
     return Future.future()
   }
