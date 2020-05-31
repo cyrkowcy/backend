@@ -6,7 +6,7 @@ data class Route(
 
 data class RouteDto(
   val name: String,
-  val points: List<Point>
+  val points: Any
 ) {
   companion object {
     fun from(route: Route, points: List<Point>): RouteDto {

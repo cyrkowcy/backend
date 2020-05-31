@@ -77,7 +77,7 @@ class TripService(
     routeName: String,
     points: JsonArray,
     email: String
-  ): Future<JsonObject> {
+  ): Future<TripDto> {
     if (cost.isBlank() or description.isBlank() or routeName.isBlank() or active == null) {
       return Future.failedFuture(ValidationException("Lack of informations"))
     }
@@ -91,7 +91,7 @@ class TripService(
     return userRepository.getUserByEmail(email)
       .compose { user ->
         tripRepository.insertAll(
-          user.id,
+          user,
           cost,
           description,
           peopleLimit,
