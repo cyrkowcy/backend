@@ -4,11 +4,7 @@ import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import pl.edu.pk.backend.model.TripCommentDto
-import pl.edu.pk.backend.model.TripDto
-import pl.edu.pk.backend.model.Route
-import pl.edu.pk.backend.model.RouteDto
-import pl.edu.pk.backend.model.Point
+import pl.edu.pk.backend.model.*
 import pl.edu.pk.backend.repository.TripCommentRepository
 import pl.edu.pk.backend.repository.TripRepository
 import pl.edu.pk.backend.repository.UserRepository
@@ -110,29 +106,21 @@ class TripService(
     newDescription: String?,
     newPeopleLimit: Int?,
     newDateTrip: String?,
-    active: Boolean?
-  ): Future<JsonObject> {
+    active: Boolean?,
+    guide: String
+  ): Future<TripDto> {
     var newDateTripOffset: OffsetDateTime? = null
     if (newDateTrip != null) {
       newDateTripOffset = OffsetDateTime.parse(newDateTrip)
-      if (!validateDate(newDateTrip) || newDateTripOffset.isBefore(OffsetDateTime.now()))
+      if (!validateDate(newDateTrip) || newDateTripOffset.isBefore(OffsetDateTime.now())) {
         return Future.failedFuture(ValidationException("Wrong date."))
-    }
-
-    if (newCost != null || newDescription != null || newPeopleLimit != null || newDateTripOffset != null ||
-      active != null) {
-      tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active)
-    }
-    if (body.containsKey("route")) {
-      if (body.getJsonObject("route").containsKey("name")) {
-        tripRepository.updateRoute(body.getJsonObject("route").getString("name"), tripId)
       }
-      if (body.getJsonObject("route").containsKey("points")) {
-        return tripRepository.updateCoordinate(body.getJsonObject("route").getJsonArray("points"), tripId)
-      }
-      return Future.future { JsonObject("""{"cost": $newCost}""".trimMargin()) }
     }
-    return Future.future()
+    tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active).compose {
+      tripRepository.updateRoute(body.getJsonObject("route").getString("name"), tripId)
+      tripRepository.updateCoordinate(body.getJsonObject("route").getJsonArray("points"), tripId)
+    }
+    return getTrip(guide, tripId)
   }
 
   fun createComment(tripId: Int, content: String, email: String): Future<JsonObject> {

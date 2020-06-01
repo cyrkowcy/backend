@@ -17,11 +17,11 @@ data class Trip(
 
 data class TripDto(
   val id: Int,
-  val cost: String,
-  val description: String,
-  val peopleLimit: Int,
-  val dateTrip: String,
-  val active: Boolean,
+  val cost: String?,
+  val description: String?,
+  val peopleLimit: Int?,
+  val dateTrip: String?,
+  val active: Boolean?,
   val guide: User,
   val route: RouteDto
 ) {
