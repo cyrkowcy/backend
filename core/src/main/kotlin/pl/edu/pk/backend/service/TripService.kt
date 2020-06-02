@@ -4,7 +4,11 @@ import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import pl.edu.pk.backend.model.*
+import pl.edu.pk.backend.model.TripDto
+import pl.edu.pk.backend.model.Point
+import pl.edu.pk.backend.model.Route
+import pl.edu.pk.backend.model.RouteDto
+import pl.edu.pk.backend.model.TripCommentDto
 import pl.edu.pk.backend.repository.TripCommentRepository
 import pl.edu.pk.backend.repository.TripRepository
 import pl.edu.pk.backend.repository.UserRepository
@@ -116,9 +120,15 @@ class TripService(
         return Future.failedFuture(ValidationException("Wrong date."))
       }
     }
-    tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active).compose {
-      tripRepository.updateRoute(body.getJsonObject("route").getString("name"), tripId)
-      tripRepository.updateCoordinate(body.getJsonObject("route").getJsonArray("points"), tripId)
+    tripRepository.updateTrip(tripId, newCost, newDescription, newPeopleLimit, newDateTripOffset, active).setHandler {
+      if (body.containsKey("route")) {
+        if (body.getJsonObject("route").containsKey("name")) {
+          tripRepository.updateRoute(body.getJsonObject("route").getString("name"), tripId)
+        }
+        if (body.getJsonObject("route").containsKey("points")) {
+          tripRepository.updateCoordinate(body.getJsonObject("route").getJsonArray("points"), tripId)
+        }
+      }
     }
     return getTrip(guide, tripId)
   }
