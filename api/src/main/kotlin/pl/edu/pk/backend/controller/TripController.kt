@@ -64,7 +64,7 @@ class TripController(private val tripService: TripService) {
     val newICost: Int? = body.getInteger("cost")
     val newDescription: String? = body.getString("description")
     val newPeopleLimit: Int? = body.getInteger("peopleLimit")
-    val newDateTrip: String? = body.getString("DateTrip")
+    val newDateTrip: String? = body.getString("dateTrip")
     val active: Boolean? = body.getBoolean("active")
     val newRoute: JsonObject? = body.getJsonObject("route")
 
@@ -87,7 +87,8 @@ class TripController(private val tripService: TripService) {
       newDescription,
       newPeopleLimit,
       newDateTrip,
-      active
+      active,
+      ctx.getCurrentUserEmail()
     ))
   }
 
