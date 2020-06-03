@@ -5,8 +5,8 @@ import org.apache.logging.log4j.LogManager
 import pl.edu.pk.backend.app.App
 import pl.edu.pk.backend.app.Config
 import pl.edu.pk.backend.app.Controllers
-import pl.edu.pk.backend.app.createDatabasePool
 import pl.edu.pk.backend.app.InitDatabase
+import pl.edu.pk.backend.app.createDatabasePool
 import pl.edu.pk.backend.app.createRouter
 import pl.edu.pk.backend.app.migrateDatabase
 

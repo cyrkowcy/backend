@@ -32,8 +32,10 @@ class TicketCommentRepository(private val pool: PgPool) {
   fun insertComment(ticketId: Int, content: String, sensitiveUser: SensitiveUser): Future<TicketCommentDto> {
     val promise = Promise.promise<TicketCommentDto>()
     val createTime = OffsetDateTime.now()
-    pool.preparedQuery("""INSERT INTO ticket_comment (content, user_account_id, ticket_id, create_date)
-      Values($1, $2, $3, $4)""".trimMargin(), Tuple.of(content, sensitiveUser.id, ticketId, createTime)) { ar ->
+    pool.preparedQuery(
+      """INSERT INTO ticket_comment (content, user_account_id, ticket_id, create_date)
+      Values($1, $2, $3, $4)""".trimMargin(), Tuple.of(content, sensitiveUser.id, ticketId, createTime)
+    ) { ar ->
       if (ar.succeeded()) {
         promise.complete(TicketCommentDto(content, sensitiveUser.toUser()))
       } else {

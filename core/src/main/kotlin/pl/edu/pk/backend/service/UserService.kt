@@ -10,8 +10,8 @@ import org.apache.commons.validator.routines.EmailValidator
 import pl.edu.pk.backend.model.Login
 import pl.edu.pk.backend.model.Role
 import pl.edu.pk.backend.model.SensitiveUser
-import pl.edu.pk.backend.model.User
 import pl.edu.pk.backend.model.TripDto
+import pl.edu.pk.backend.model.User
 import pl.edu.pk.backend.repository.RoleUserRepository
 import pl.edu.pk.backend.repository.TripRepository
 import pl.edu.pk.backend.repository.UserRepository
@@ -189,14 +189,14 @@ class UserService(
   fun joinTrip(email: String, tripId: Int): Future<JsonObject> {
     return tripRepository.getTripByTripId(tripId)
       .compose {
-          tripRepository.insertUserTrip(email, tripId)
+        tripRepository.insertUserTrip(email, tripId)
       }
   }
 
   fun deleteUserTrip(email: String, tripId: Int): Future<JsonObject> {
     return tripRepository.getTripUserToDelete(email, tripId)
       .compose {
-          tripRepository.deleteUserTrip(email, tripId)
+        tripRepository.deleteUserTrip(email, tripId)
       }
   }
 }

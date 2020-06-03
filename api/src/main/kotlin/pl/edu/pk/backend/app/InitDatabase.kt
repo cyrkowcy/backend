@@ -47,7 +47,8 @@ class InitDatabase(val services: Services) {
         "Anna",
         "Kowalska",
         "anna@anna.pl",
-        "123456")
+        "123456"
+      )
         .compose {
           services.userService.patchUser(
             "anna@anna.pl",
@@ -60,7 +61,8 @@ class InitDatabase(val services: Services) {
         "Grzegorz",
         "Brzęczyszczykiewicz",
         "grzegorz@grzegorz.pl",
-        "123456")
+        "123456"
+      )
     }
   }
 

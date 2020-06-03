@@ -4,8 +4,8 @@ import pl.edu.pk.backend.Services
 import pl.edu.pk.backend.controller.AuthorizationController
 import pl.edu.pk.backend.controller.StatusController
 import pl.edu.pk.backend.controller.TicketController
-import pl.edu.pk.backend.controller.UserController
 import pl.edu.pk.backend.controller.TripController
+import pl.edu.pk.backend.controller.UserController
 
 class Controllers(services: Services) {
   val authorizationController by lazy {

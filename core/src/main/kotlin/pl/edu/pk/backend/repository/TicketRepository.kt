@@ -72,19 +72,23 @@ class TicketRepository(private val pool: PgPool) {
   fun insertTicket(userId: Int, content: String, email: String): Future<TicketDto> {
     val promise = Promise.promise<TicketDto>()
     val createTime = OffsetDateTime.now()
-    pool.preparedQuery("INSERT INTO ticket (user_account_id, content, create_date)" +
-      " VALUES($1, $2, $3) RETURNING id_ticket",
-      Tuple.of(userId, content, createTime)) { ar ->
+    pool.preparedQuery(
+      "INSERT INTO ticket (user_account_id, content, create_date)" +
+        " VALUES($1, $2, $3) RETURNING id_ticket",
+      Tuple.of(userId, content, createTime)
+    ) { ar ->
       if (ar.succeeded()) {
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
         val ticketId = ar.result().first().getInteger("id_ticket")
-        promise.complete(TicketDto(
-          ticketId,
-          false,
-          email,
-          createTime.format(formatter),
-          content
-        ))
+        promise.complete(
+          TicketDto(
+            ticketId,
+            false,
+            email,
+            createTime.format(formatter),
+            content
+          )
+        )
       } else {
         promise.fail(ar.cause())
       }
@@ -113,15 +117,18 @@ class TicketRepository(private val pool: PgPool) {
         "UPDATE ticket SET $setExpr FROM user_account WHERE id_ticket = $${counter.getAndIncrement()} $oneUser" +
         " RETURNING 1)" +
         "SELECT COUNT(*) FROM rows",
-      tuple) { ar ->
+      tuple
+    ) { ar ->
       if (ar.succeeded()) {
         val localCounter = ar.result().first().getValue(0)
         if (localCounter.toString() == "0") {
           promise.fail(NoSuchResourceException("No ticket with id $ticketId or you don't have rights to modify it."))
         } else {
-          promise.complete(JsonObject()
-            .put("content", newContent)
-            .put("closed", closed))
+          promise.complete(
+            JsonObject()
+              .put("content", newContent)
+              .put("closed", closed)
+          )
         }
       } else {
         promise.fail(ar.cause())

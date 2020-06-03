@@ -34,8 +34,12 @@ class UserControllerTest {
     val service = mockk<UserService>(relaxed = true)
     val controller = UserController(service)
     every { service.getUserByEmail(any()) } returns
-      Future.succeededFuture(User("", "", "", false, listOf(Role.User),
-        OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))))
+      Future.succeededFuture(
+        User(
+          "", "", "", false, listOf(Role.User),
+          OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
+        )
+      )
     every { ctx.queryParam("email") } returns listOf("test@example.com")
     every { ctx.get<String>("currentUserEmail") } returns "test@example.com"
     every { ctx.get<List<Role>>("currentUserRoles") } returns listOf(Role.User)
@@ -66,8 +70,12 @@ class UserControllerTest {
     val service = mockk<UserService>(relaxed = true)
     val controller = UserController(service)
     every { service.createUser(any(), any(), any(), any()) } returns
-      Future.succeededFuture(User("", "", "", false, listOf(Role.User),
-        OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))))
+      Future.succeededFuture(
+        User(
+          "", "", "", false, listOf(Role.User),
+          OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
+        )
+      )
     every { ctx.get<String>("currentUserEmail") } returns null
     every { ctx.bodyAsJson } returns JsonObject(
       mapOf(

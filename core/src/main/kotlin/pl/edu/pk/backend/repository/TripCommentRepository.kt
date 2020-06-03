@@ -57,8 +57,10 @@ class TripCommentRepository(private val pool: PgPool) {
   fun insertComment(tripId: Int, content: String, userId: Int): Future<JsonObject> {
     val promise = Promise.promise<JsonObject>()
     val deleted = false
-    pool.preparedQuery("""INSERT INTO trip_comment (content, user_account_id, trip_id, deleted)
-      Values($1, $2, $3, $4)""".trimMargin(), Tuple.of(content, userId, tripId, deleted)) { ar ->
+    pool.preparedQuery(
+      """INSERT INTO trip_comment (content, user_account_id, trip_id, deleted)
+      Values($1, $2, $3, $4)""".trimMargin(), Tuple.of(content, userId, tripId, deleted)
+    ) { ar ->
       if (ar.succeeded()) {
         promise.complete()
       } else {

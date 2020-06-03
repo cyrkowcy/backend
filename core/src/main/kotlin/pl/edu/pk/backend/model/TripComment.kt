@@ -15,7 +15,8 @@ class TripCommentDto(
     fun from(tripComment: TripComment): TripCommentDto {
       return TripCommentDto(
         tripComment.content,
-        tripComment.user.email)
+        tripComment.user.email
+      )
     }
   }
 }

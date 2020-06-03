@@ -23,12 +23,14 @@ import java.time.format.DateTimeFormatter
 class UserServiceTest {
   @Test
   fun `return user`(vertx: Vertx, testContext: VertxTestContext) {
-    val service = UserService(vertx,
+    val service = UserService(
+      vertx,
       mockUserRepository(),
       mockRoleUserRepository(),
       mockTripRepository(),
       mockTripService(),
-      mockk(relaxed = true))
+      mockk(relaxed = true)
+    )
 
     val result = service.getUserByEmail("foo@example.com")
 
@@ -39,12 +41,14 @@ class UserServiceTest {
 
   @Test
   fun `fail for missing user`(vertx: Vertx, testContext: VertxTestContext) {
-    val service = UserService(vertx,
+    val service = UserService(
+      vertx,
       mockUserRepository(),
       mockk(relaxed = true),
       mockTripRepository(),
       mockTripService(),
-      mockk(relaxed = true))
+      mockk(relaxed = true)
+    )
 
     val result = service.getUserByEmail("bar")
 
@@ -57,8 +61,10 @@ class UserServiceTest {
     val repo = mockk<UserRepository>()
     every { repo.getUserByEmail(any()) } returns Future.failedFuture(NoSuchResourceException(""))
     every { repo.getUserByEmail(eq("foo@example.com")) } returns Future.succeededFuture(
-      SensitiveUser(1, "", "", "foo@example.com", "", false, listOf(Role.User),
-        OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")))
+      SensitiveUser(
+        1, "", "", "foo@example.com", "", false, listOf(Role.User),
+        OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
+      )
     )
     return repo
   }

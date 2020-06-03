@@ -51,8 +51,12 @@ class UserRepository(private val pool: PgPool) {
       Tuple.of(firstName, lastName, email, password, createDate)
     ) { ar ->
       if (ar.succeeded()) {
-        promise.complete(User(firstName, lastName, email, false, emptyList(),
-          createDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))))
+        promise.complete(
+          User(
+            firstName, lastName, email, false, emptyList(),
+            createDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
+          )
+        )
       } else {
         promise.fail(ar.cause())
       }
