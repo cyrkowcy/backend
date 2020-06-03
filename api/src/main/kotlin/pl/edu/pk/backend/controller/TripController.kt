@@ -42,17 +42,29 @@ class TripController(private val tripService: TripService) {
       return
     }
 
+    repeat(points.size()) {
+      if (points.getJsonObject(it).getInteger("order") == null ||
+        points.getJsonObject(it).getString("coordinates") == null
+      ) {
+        ctx.failValidation(ApiError.Body, "Invalid point data, specify order and coordinates")
+        return
+      }
+    }
+
     val cost = iCost.toString()
 
-    ctx.handleResult(tripService.createTrip(
-      cost,
-      description,
-      peopleLimit,
-      dateTrip,
-      active,
-      routeName,
-      points,
-      ctx.getCurrentUserEmail()))
+    ctx.handleResult(
+      tripService.createTrip(
+        cost,
+        description,
+        peopleLimit,
+        dateTrip,
+        active,
+        routeName,
+        points,
+        ctx.getCurrentUserEmail()
+      )
+    )
   }
 
   fun patchTrip(ctx: RoutingContext) {
@@ -70,26 +82,30 @@ class TripController(private val tripService: TripService) {
 
     val newCost: String? = newICost.toString()
 
-    if (listOf(newCost,
+    if (listOf(
+        newCost,
         newDescription,
         newPeopleLimit,
         newDateTrip,
         active,
         newRoute
-      ).all { it == null }) {
+      ).all { it == null }
+    ) {
       ctx.failValidation(ApiError.Body, "At least one parameter is required for trip patch")
       return
     }
-    ctx.handleResult(tripService.patchTrip(
-      body,
-      tripId.toInt(),
-      newCost,
-      newDescription,
-      newPeopleLimit,
-      newDateTrip,
-      active,
-      ctx.getCurrentUserEmail()
-    ))
+    ctx.handleResult(
+      tripService.patchTrip(
+        body,
+        tripId.toInt(),
+        newCost,
+        newDescription,
+        newPeopleLimit,
+        newDateTrip,
+        active,
+        ctx.getCurrentUserEmail()
+      )
+    )
   }
 
   fun createTripComment(ctx: RoutingContext) {
@@ -114,8 +130,12 @@ class TripController(private val tripService: TripService) {
       ctx.failValidation(ApiError.Body, "At least one parameter is required for trip comment patch")
       return
     }
-    ctx.handleResult(tripService.patchComment(tripId.toInt(), commentId.toInt(), content, deleted,
-      ctx.getCurrentUserEmail(),
-      ctx.checkIfCurrentUserHasRole(Role.Admin)))
+    ctx.handleResult(
+      tripService.patchComment(
+        tripId.toInt(), commentId.toInt(), content, deleted,
+        ctx.getCurrentUserEmail(),
+        ctx.checkIfCurrentUserHasRole(Role.Admin)
+      )
+    )
   }
 }

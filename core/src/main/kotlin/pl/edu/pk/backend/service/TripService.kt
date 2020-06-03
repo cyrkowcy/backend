@@ -4,11 +4,11 @@ import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import pl.edu.pk.backend.model.TripDto
 import pl.edu.pk.backend.model.Point
 import pl.edu.pk.backend.model.Route
 import pl.edu.pk.backend.model.RouteDto
 import pl.edu.pk.backend.model.TripCommentDto
+import pl.edu.pk.backend.model.TripDto
 import pl.edu.pk.backend.repository.TripCommentRepository
 import pl.edu.pk.backend.repository.TripRepository
 import pl.edu.pk.backend.repository.UserRepository
@@ -27,16 +27,18 @@ class TripService(
   private fun getRouteAndPoints(routeId: Int): Future<Pair<Route, List<Point>>> {
     return tripRepository.getRoute(routeId)
       .compose { tripRepository.getPoints(routeId).map { points -> Pair(it, points) } }
-}
+  }
 
   private fun getRoutes(routeId: Int): Future<Route> {
     return tripRepository.getRoute(routeId).map { RouteDto.fromRoute(it) }
   }
 
   fun getTrip(email: String, tripId: Int): Future<TripDto> {
-    return tripRepository.getTripByEmail(email, tripId).compose { getRouteAndPoints(it.routeId)
-      .map { (route, points) ->
-        TripDto.from(it, route, points) }
+    return tripRepository.getTripByEmail(email, tripId).compose {
+      getRouteAndPoints(it.routeId)
+        .map { (route, points) ->
+          TripDto.from(it, route, points)
+        }
     }
   }
 
@@ -59,12 +61,11 @@ class TripService(
   }
 
   private fun validateDate(dateToValidate: String): Boolean {
-    val data: OffsetDateTime
-    try {
-        data = OffsetDateTime.parse(dateToValidate)
-        return true
+    return try {
+      OffsetDateTime.parse(dateToValidate)
+      true
     } catch (e: DateTimeParseException) {
-      return false
+      false
     }
   }
 
@@ -78,14 +79,15 @@ class TripService(
     points: JsonArray,
     email: String
   ): Future<TripDto> {
-    if (cost.isBlank() or description.isBlank() or routeName.isBlank() or active == null) {
+    if (cost.isBlank() || description.isBlank() || routeName.isBlank()) {
       return Future.failedFuture(ValidationException("Lack of informations"))
     }
-    if ((peopleLimit < 1)) {
+    if (peopleLimit < 1) {
       return Future.failedFuture(ValidationException("People Limit can't be lower than 1"))
     }
     if (!validateDate(date) ||
-      OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME).isBefore(OffsetDateTime.now())) {
+      OffsetDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME).isBefore(OffsetDateTime.now())
+    ) {
       return Future.failedFuture(ValidationException("Wrong date or format (yyyy-MM-ddTHH:mm+01:00)"))
     }
     return userRepository.getUserByEmail(email)
@@ -156,8 +158,12 @@ class TripService(
         if (email == user.email || isAdmin) {
           tripCommentRepository.updateComment(commentId, content, deleted)
         } else {
-          Future.failedFuture(AuthorizationException("You don't have permission " +
-            "to update comment: $commentId"))
+          Future.failedFuture(
+            AuthorizationException(
+              "You don't have permission " +
+                "to update comment: $commentId"
+            )
+          )
         }
       }
   }
