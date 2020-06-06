@@ -9,13 +9,13 @@ class TripComment(
 
 class TripCommentDto(
   val content: String,
-  val author: String
+  val author: User
 ) {
   companion object {
     fun from(tripComment: TripComment): TripCommentDto {
       return TripCommentDto(
         tripComment.content,
-        tripComment.user.email
+        tripComment.user.toUser()
       )
     }
   }

@@ -135,14 +135,14 @@ class TripService(
     return getTrip(guide, tripId)
   }
 
-  fun createComment(tripId: Int, content: String, email: String): Future<JsonObject> {
+  fun createComment(tripId: Int, content: String, email: String): Future<TripCommentDto> {
     if (content.isBlank()) {
       return Future.failedFuture(ValidationException("Content is blank."))
     } else if (content.length > 1000) {
       return Future.failedFuture(ValidationException("Content is too long. Max content size 1000"))
     }
     return userRepository.getUserByEmail(email)
-      .compose { tripCommentRepository.insertComment(tripId, content, it.id) }
+      .compose { tripCommentRepository.insertComment(tripId, content, it) }
   }
 
   fun patchComment(

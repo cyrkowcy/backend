@@ -508,8 +508,12 @@ Non-admin user can only patch themselves. Admin can patch anyone."
               $ref: '#/components/schemas/NewComment'
         required: true
       responses:
-        "204":
+        "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentWithAuthor'
         "400":
           description: Bad request
         "404":
