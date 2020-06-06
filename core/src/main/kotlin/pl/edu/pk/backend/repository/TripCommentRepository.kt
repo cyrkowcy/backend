@@ -9,6 +9,7 @@ import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.Tuple
 import pl.edu.pk.backend.model.SensitiveUser
 import pl.edu.pk.backend.model.TripComment
+import pl.edu.pk.backend.model.TripCommentDto
 import pl.edu.pk.backend.util.NoSuchResourceException
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
@@ -54,15 +55,15 @@ class TripCommentRepository(private val pool: PgPool) {
     return promise.future()
   }
 
-  fun insertComment(tripId: Int, content: String, userId: Int): Future<JsonObject> {
-    val promise = Promise.promise<JsonObject>()
+  fun insertComment(tripId: Int, content: String, sensitiveUser: SensitiveUser): Future<TripCommentDto> {
+    val promise = Promise.promise<TripCommentDto>()
     val deleted = false
     pool.preparedQuery(
       """INSERT INTO trip_comment (content, user_account_id, trip_id, deleted)
-      Values($1, $2, $3, $4)""".trimMargin(), Tuple.of(content, userId, tripId, deleted)
+      Values($1, $2, $3, $4)""".trimMargin(), Tuple.of(content, sensitiveUser.id, tripId, deleted)
     ) { ar ->
       if (ar.succeeded()) {
-        promise.complete()
+        promise.complete(TripCommentDto(content, sensitiveUser.toUser()))
       } else {
         if (ar.cause() is PgException && (ar.cause() as PgException).code == "23503") {
           promise.fail(NoSuchResourceException("No such trip with id: $tripId"))

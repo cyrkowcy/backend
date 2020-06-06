@@ -6,6 +6,7 @@ import io.vertx.core.json.JsonObject
 import org.apache.logging.log4j.LogManager
 import pl.edu.pk.backend.Services
 import pl.edu.pk.backend.model.Role
+import pl.edu.pk.backend.model.TripCommentDto
 import pl.edu.pk.backend.model.User
 
 private val logger = LogManager.getLogger("Init database")
@@ -100,7 +101,7 @@ class InitDatabase(val services: Services) {
     }
   }
 
-  fun addTrips(): Future<JsonObject> {
+  fun addTrips(): Future<TripCommentDto> {
     logger.info("Adding trips")
     val order: Int = 1
     val point: JsonObject = JsonObject("""{"order": $order, "coordinates": "41°24'12.2\"N 2°10'26.5\"E" }""")
