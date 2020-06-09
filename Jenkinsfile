@@ -68,6 +68,20 @@ pipeline {
         sh 'docker run -d -p 8091:8090 -e DATABASE_HOST=172.18.0.4:5432 -e DATABASE_NAME=tourtool_pre -e DATABASE_USER -e DATABASE_PASSWORD -e APP_SECRET -e STAGE=STA --name backendruntest --restart always --net netapp -it backendtest'
       }
     }
+    stage('Smoke Test') {
+      when {
+        anyOf {
+          branch 'master'
+        }
+
+      }
+      steps {
+        withGradle() {
+          sh './gradlew smoke:test'
+        }
+
+      }
+    }
     stage('Ask Promote') {
       when {
         anyOf {
@@ -134,5 +148,7 @@ pipeline {
     DATABASE_USER = 'backend'
     DATABASE_PASSWORD = credentials('database-password')
     APP_SECRET = credentials('app-secret')
+    USER_EMAIL = credentials('user-email')
+    USER_PASSWORD = credentials('user-password')
   }
 }
