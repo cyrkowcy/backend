@@ -120,6 +120,7 @@ private fun mapCommentAuthor(row: Row): SensitiveUser {
     row.getString("password"),
     row.getBoolean("disabled"),
     emptyList(),
-    row.getOffsetDateTime("create_date").format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+    row.getOffsetDateTime("create_date").format(DateTimeFormatter.ofPattern("dd-MM-yyyy")),
+    row.getString("image")
   )
 }

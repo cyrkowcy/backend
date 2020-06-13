@@ -118,6 +118,27 @@ Non-admin user can only patch themselves. Admin can patch anyone."
           description: OK
         "400":
           description: Bad request
+  "/user/image":
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - user
+      summary: Patch image
+      description: "Non-admin user can only patch themselves. Admin can patch anyone."
+      operationId: patchImage
+      parameters:
+        - name: email
+          in: path
+          description: User email
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
   /users:
     get:
       security:

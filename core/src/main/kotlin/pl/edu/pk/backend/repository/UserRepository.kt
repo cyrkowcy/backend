@@ -110,8 +110,27 @@ class UserRepository(private val pool: PgPool) {
         row.getString("password"),
         row.getBoolean("disabled"),
         emptyList(),
-        row.getOffsetDateTime("create_date").format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
+        row.getOffsetDateTime("create_date").format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+        row.getString("image")
       )
     }
+  }
+  fun updateImage(
+    targetEmail: String,
+    targetImage: String?
+  ): Future<Nothing> {
+    val promise = Promise.promise<Nothing>()
+    val counter = AtomicInteger(1)
+    pool.preparedQuery(
+      "UPDATE user_account SET image = $1 WHERE email = $2",
+      Tuple.of(targetImage, targetEmail)
+    ) { ar ->
+      if (ar.succeeded()) {
+        promise.complete()
+      } else {
+        promise.fail(ar.cause())
+      }
+    }
+    return promise.future()
   }
 }
