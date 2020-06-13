@@ -54,7 +54,7 @@ class UserRepository(private val pool: PgPool) {
         promise.complete(
           User(
             firstName, lastName, email, false, emptyList(),
-            createDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
+            createDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")), "default.png"
           )
         )
       } else {

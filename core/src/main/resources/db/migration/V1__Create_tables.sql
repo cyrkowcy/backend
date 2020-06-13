@@ -4,8 +4,7 @@ CREATE TABLE user_account(
     last_name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    disabled BOOLEAN NOT NULL DEFAULT FALSE,
-    image TEXT DEFAULT 'default.png'
+    disabled BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE role (
