@@ -24,6 +24,7 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
 
   with(controllers.statusController) {
     router.get("/status").handler(::getStatus)
+    router.get("/shutdown").handler(::shutdown)
   }
 
   with(controllers.userController) {
