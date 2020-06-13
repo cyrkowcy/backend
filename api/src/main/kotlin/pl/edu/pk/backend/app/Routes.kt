@@ -24,6 +24,7 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
 
   with(controllers.statusController) {
     router.get("/status").handler(::getStatus)
+    router.get("/shutdown").handler(::shutdown)
   }
 
   with(controllers.userController) {
@@ -35,6 +36,7 @@ fun createRouter(vertx: Vertx, controllers: Controllers): Router {
     router.get("/user/trips").handler(::getUserTrips)
     router.post("/user/trips/:tripId").handler(::postUserTrip)
     router.get("/user/trips/active").handler(::getAvailableTripsForUser)
+    router.patch("/user/:image").handler(::patchImage)
     router.delete("/user/trips/:tripId").handler(::deleteUserTrip)
   }
 

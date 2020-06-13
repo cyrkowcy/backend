@@ -107,4 +107,29 @@ class UserController(private val userService: UserService) {
     val tripId = ctx.pathParam("tripId")
     ctx.handleResult(userService.deleteUserTrip(email, tripId.toInt()))
   }
+  fun patchImage(ctx: RoutingContext) {
+    val targetEmail = ctx.pathParam("email")
+    val body = ctx.safeBodyAsJson() ?: return
+    val newImage: String? = body.getString("image")
+    val adminNeeded = targetEmail != ctx.getCurrentUserEmail()
+
+    if (adminNeeded) {
+      if (!ctx.checkCurrentUserHasRole(Role.Admin)) {
+        return
+      }
+    } else {
+      if (!ctx.checkCurrentUserHasRole(Role.User)) {
+        return
+      }
+    }
+    if (newImage == null) {
+      ctx.failValidation(ApiError.Body, "no immage")
+    }
+    ctx.handleResult(
+      userService.patchImage(
+        targetEmail,
+        newImage
+      )
+    )
+  }
 }

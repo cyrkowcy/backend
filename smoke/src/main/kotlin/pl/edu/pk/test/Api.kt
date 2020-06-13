@@ -69,6 +69,14 @@ interface Api {
   ): Call<JsonObject>
 
   @Headers("Content-Type: application/json")
+  @PATCH("user/image")
+  fun patchImage(
+    @Header("Authorization") token: String,
+    @Path("image") image: String,
+    @Body user: JsonObject
+  ): Call<JsonObject>
+
+  @Headers("Content-Type: application/json")
   @GET("tickets")
   fun getTickets(
     @Header("Authorization") token: String,

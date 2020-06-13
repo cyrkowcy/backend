@@ -199,4 +199,10 @@ class UserService(
         tripRepository.deleteUserTrip(email, tripId)
       }
   }
+  fun patchImage(
+    email: String,
+    newImage: String?
+  ): Future<Nothing> {
+    return userRepository.updateImage(email, newImage)
+  }
 }

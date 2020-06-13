@@ -37,7 +37,8 @@ class UserControllerTest {
       Future.succeededFuture(
         User(
           "", "", "", false, listOf(Role.User),
-          OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
+          OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+          "default.png"
         )
       )
     every { ctx.queryParam("email") } returns listOf("test@example.com")
@@ -73,7 +74,8 @@ class UserControllerTest {
       Future.succeededFuture(
         User(
           "", "", "", false, listOf(Role.User),
-          OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
+          OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+          "default.png"
         )
       )
     every { ctx.get<String>("currentUserEmail") } returns null

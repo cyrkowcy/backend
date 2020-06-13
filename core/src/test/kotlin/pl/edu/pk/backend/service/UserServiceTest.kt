@@ -63,7 +63,8 @@ class UserServiceTest {
     every { repo.getUserByEmail(eq("foo@example.com")) } returns Future.succeededFuture(
       SensitiveUser(
         1, "", "", "foo@example.com", "", false, listOf(Role.User),
-        OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"))
+        OffsetDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+        "default.png"
       )
     )
     return repo
