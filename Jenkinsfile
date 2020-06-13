@@ -13,7 +13,7 @@ pipeline {
     stage('Test') {
       steps {
         withGradle() {
-          sh './gradlew clean ktlintCheck test --info'
+          sh './gradlew clean ktlintCheck test -x :smoke:test --info'
         }
 
       }
