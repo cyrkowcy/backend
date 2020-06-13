@@ -29,7 +29,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiStatus"
-    "/shutdown":
+  "/shutdown":
     post:
       security:
         - bearerAuth: []
@@ -37,9 +37,14 @@ paths:
         - status
       summary: shutdown app
       description: "admin user can only shutdown."
-      operationId: patchImage
+      operationId: shutdown
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
 
-    
+
 
   /login:
     post:
@@ -126,7 +131,21 @@ Non-admin user can only patch themselves. Admin can patch anyone."
               $ref: "#/components/schemas/User"
         required: true
       responses:
-        "204":
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+  "/user/image":
+    patch:
+      security:
+        - bearerAuth: []
+      tags:
+        - user
+      summary: Patch image
+      description: "Non-admin user can only patch themselves. Admin can patch anyone."
+      operationId: patchImage
+      responses:
+        "200":
           description: OK
         "400":
           description: Bad request
